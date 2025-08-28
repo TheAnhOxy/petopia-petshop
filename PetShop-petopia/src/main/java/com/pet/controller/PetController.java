@@ -1,11 +1,14 @@
 package com.pet.controller;
 
+import com.pet.entity.Pet;
+import com.pet.service.PetService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.ACCEPTED;
@@ -15,9 +18,17 @@ import static org.springframework.http.HttpStatus.ACCEPTED;
 @RequestMapping("/pets")
 public class PetController {
 
+    @Autowired
+    private PetService petService;
+
     @GetMapping("/hello")
     public String hello() {
         return "Hello Pet";
+    }
+
+    @GetMapping
+    public List<Pet> getALlPets() {
+        return petService.getPets();
     }
 
 //    @Autowired
