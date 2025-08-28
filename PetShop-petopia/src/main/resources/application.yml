@@ -37,6 +37,9 @@ logging:
   level:
     root: INFO
     web: INFO
+#    org.springframework: DEBUG
+#    org.springdoc: DEBUG
+#    org.apache.commons: DEBUG
     org.springframework.data.repository: DEBUG
 
 

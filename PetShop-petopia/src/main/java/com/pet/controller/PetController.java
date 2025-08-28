@@ -2,6 +2,7 @@ package com.pet.controller;
 
 import com.pet.entity.Pet;
 import com.pet.service.PetService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ public class PetController {
     private PetService petService;
 
     @GetMapping("/hello")
+    @Operation(summary = "Test API", description = "Returns a test message")
     public String hello() {
         return "Hello Pet";
     }
