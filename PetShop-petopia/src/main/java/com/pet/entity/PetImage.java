@@ -1,6 +1,6 @@
 package com.pet.entity;
 
-package com.shop.entity;
+
 
 import jakarta.persistence.*;
 import lombok.*;
