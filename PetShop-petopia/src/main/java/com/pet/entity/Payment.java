@@ -1,6 +1,6 @@
 package com.pet.entity;
 
-package com.shop.entity;
+
 
 import lombok.*;
 import com.pet.enums.PaymentMethod;

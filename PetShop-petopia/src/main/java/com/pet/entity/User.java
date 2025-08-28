@@ -85,7 +85,7 @@ public class User {
     @ToString.Exclude
     private Set<Notification> notifications;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch =FetchType.LAZY)
     private Set<LoyaltyTransaction> loyaltyTransactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
