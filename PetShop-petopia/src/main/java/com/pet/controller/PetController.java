@@ -1,6 +1,10 @@
 package com.pet.controller;
 
 import com.pet.entity.Pet;
+import com.pet.modal.request.PetSearchRequestDTO;
+import com.pet.modal.response.PageResponse;
+import com.pet.modal.response.PetForListResponseDTO;
+import com.pet.modal.response.PetResponseDTO;
 import com.pet.service.PetService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -71,5 +75,33 @@ public class PetController {
 //        return ResponseEntity.ok(result);
 //    }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PetResponseDTO> getPetById(@PathVariable String id) {
+        PetResponseDTO pet = petService.getPetById(id);
+        if (pet == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(pet);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<PetForListResponseDTO>> getAllPets() {
+        List<PetForListResponseDTO> pets = petService.getAllPets();
+        if (pets == null || pets.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(pets);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<?> advanceSearch(@RequestBody PetSearchRequestDTO request) {
+        log.info("Search transaction");
+        request.validate();
+        PageResponse<PetForListResponseDTO> result = petService.advanceSearch(request);
+        if (result.getContent() == null || result.getContent().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Not found"));
+        }
+        return ResponseEntity.ok(result);
+    }
 
 }
