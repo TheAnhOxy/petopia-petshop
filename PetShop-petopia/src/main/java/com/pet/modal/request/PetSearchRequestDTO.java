@@ -38,5 +38,17 @@ public class PetSearchRequestDTO {
         if(minHeight != null && maxHeight != null && minHeight > maxHeight) {
             throw new IllegalArgumentException("minHeight cannot be greater than maxHeight");
         }
+        if(minRating != null && (minRating < 0 || minRating > 5)) {
+            throw new IllegalArgumentException("minRating must be between 0 and 5");
+        }
+        if(page != null && page < 0) {
+            throw new IllegalArgumentException("page cannot be negative");
+        }
+        if(pageSize != null && pageSize <= 0) {
+            throw new IllegalArgumentException("pageSize must be greater than 0");
+        }
+        if(sortDirection != null && !sortDirection.equalsIgnoreCase("asc") && !sortDirection.equalsIgnoreCase("desc")) {
+            throw new IllegalArgumentException("sortDirection must be 'asc' or 'desc'");
+        }
     }
 }

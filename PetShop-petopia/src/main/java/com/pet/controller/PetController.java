@@ -1,6 +1,7 @@
 package com.pet.controller;
 
 import com.pet.entity.Pet;
+import com.pet.modal.request.PetRequestDTO;
 import com.pet.modal.request.PetSearchRequestDTO;
 import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PetForListResponseDTO;
@@ -99,9 +100,19 @@ public class PetController {
         request.validate();
         PageResponse<PetForListResponseDTO> result = petService.advanceSearch(request);
         if (result.getContent() == null || result.getContent().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Not found"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Not found any pet"));
         }
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping
+    public ResponseEntity<PetResponseDTO> addOrUpdatePet(@RequestBody PetRequestDTO petRequestDTO) {
+        petRequestDTO.validate();
+        PetResponseDTO pet = petService.addOrUpdatePet(petRequestDTO);
+        if (pet == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(pet);
     }
 
 }

@@ -30,6 +30,9 @@ public class Service {
     @Column(name = "price", nullable = false)
     private Double price;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)", updatable = false)
     private LocalDateTime createdAt;
