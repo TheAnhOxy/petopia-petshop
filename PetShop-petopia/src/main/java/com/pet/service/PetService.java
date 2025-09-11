@@ -14,7 +14,10 @@ public interface PetService {
     List<Pet> getPets();
 
     PetResponseDTO getPetById(String petId);
-    List<PetForListResponseDTO> getAllPets();
+    PageResponse<PetForListResponseDTO> getPetsByCategory(String categoryId, int page, int size);
+    PageResponse<PetForListResponseDTO> getAllPets(int page, int size);
+    PageResponse<PetForListResponseDTO> getAllPetsWithStatusActive(int page, int size);
     PageResponse<PetForListResponseDTO> advanceSearch(PetSearchRequestDTO request);
     PetResponseDTO addOrUpdatePet(PetRequestDTO request);
+    PetResponseDTO inactivePet(String petId);
 }

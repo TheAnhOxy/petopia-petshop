@@ -9,13 +9,17 @@ import com.pet.enums.PetGender;
 import com.pet.enums.PetStatus;
 import com.pet.exception.ResourceNotFoundException;
 import com.pet.modal.request.PetRequestDTO;
+import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PetForListResponseDTO;
 import com.pet.modal.response.PetResponseDTO;
 import com.pet.repository.CategoryRepository;
 import com.pet.repository.PetImageRepository;
 import com.pet.repository.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -34,7 +38,6 @@ public class PetConverter {
     }
 
     public PetResponseDTO mapToDTO(Pet pet) {
-        System.out.println("ss");
         return mapPet(pet, PetResponseDTO.class);
     }
 
@@ -45,7 +48,7 @@ public class PetConverter {
         if( pet.getPetId() != null) {
             pet.setStatus(PetStatus.valueOf(dto.getStatus().toUpperCase()));
         }else{
-            pet.setPetId(generatePromotionId()); //Hoặc UUID.randomUUID().toString()
+            pet.setPetId(generatePetId()); //Hoặc UUID.randomUUID().toString()
             pet.setStatus(PetStatus.AVAILABLE);
         }
         if (dto.getFurType() != null) {
@@ -82,6 +85,19 @@ public class PetConverter {
         return dto;
     }
 
+    public PageResponse<PetForListResponseDTO> toPageResponse(Page<Pet> petPage) {
+        List<PetForListResponseDTO> petDTOs = petPage.getContent().stream()
+                .map(this::mapToPetForListDTO)
+                .toList();
+
+        PageResponse<PetForListResponseDTO> response = new PageResponse<>();
+        response.setContent(petDTOs);
+        response.setPage(petPage.getNumber());
+        response.setSize(petPage.getSize());
+        response.setTotalElements(petPage.getTotalElements());
+        return response;
+    }
+
     private Double calculateAverageRating(Pet pet) {
         return pet.getReviews() != null && !pet.getReviews().isEmpty() ?
                 pet.getReviews().stream()
@@ -91,7 +107,7 @@ public class PetConverter {
                 : 5.0;
     }
 
-    private String generatePromotionId() {
+    private String generatePetId() {
         long count = petRepository.count() + 1;
         return String.format("P%03d", count);
     }

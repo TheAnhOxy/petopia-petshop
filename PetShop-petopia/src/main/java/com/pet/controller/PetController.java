@@ -84,11 +84,40 @@ public class PetController {
         }
         return ResponseEntity.ok(pet);
     }
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<PageResponse<PetForListResponseDTO>> getPetsByCategory(
+            @PathVariable String categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<PetForListResponseDTO> pets = petService.getPetsByCategory(categoryId, page, size);
+        if (pets == null || pets.getContent().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(pets);
+    }
 
+    // Phương thức dành cho admin
     @GetMapping("/list")
-    public ResponseEntity<List<PetForListResponseDTO>> getAllPets() {
-        List<PetForListResponseDTO> pets = petService.getAllPets();
-        if (pets == null || pets.isEmpty()) {
+    public ResponseEntity<PageResponse<PetForListResponseDTO>> getAllPets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<PetForListResponseDTO> pets = petService.getAllPets(page, size);
+        if (pets == null || pets.getContent().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(pets);
+    }
+
+    // Phương thức dành cho web
+    @GetMapping("/available")
+    public ResponseEntity<PageResponse<PetForListResponseDTO>> getAllPetsWithStatusActive(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<PetForListResponseDTO> pets = petService.getAllPetsWithStatusActive(page, size);
+        if (pets == null || pets.getContent().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok(pets);
@@ -113,6 +142,15 @@ public class PetController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(pet);
+    }
+
+    @PutMapping("/{id}/inactive")
+    public ResponseEntity<PetResponseDTO> inactivePet(@PathVariable String id) {
+        PetResponseDTO pet = petService.inactivePet(id);
+        if (pet == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(pet);
     }
 
 }
