@@ -43,5 +43,5 @@ public class Service {
 
     @OneToMany(mappedBy = "service", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = false)
     @ToString.Exclude
-    private Set<OrderService> orderServices;
+    private Set<BookingService> bookingServices;
 }

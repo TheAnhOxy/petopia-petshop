@@ -73,10 +73,6 @@ public class Order {
     @ToString.Exclude
     private Set<OrderItem> orderItems;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private Set<OrderService> orderServices;
-
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = false, fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<Payment> payments;

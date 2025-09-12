@@ -133,15 +133,19 @@ CREATE TABLE order_items (
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON DELETE CASCADE
 );
 
--- 10. Bảng order_services: Dịch vụ kèm theo trong đơn hàng
-CREATE TABLE order_services (
-    order_service_id VARCHAR(10) PRIMARY KEY, 
-    order_id VARCHAR(10),
+-- 10. Bảng booking_services: Dịch vụ kèm theo trong đơn hàng
+CREATE TABLE booking_services (
+    booking_service_id VARCHAR(10) PRIMARY KEY, 
+    user_id VARCHAR(10),
     service_id VARCHAR(10),
+    appointment_date DATETIME(6) NULL,  -- lịch hẹn (NULL nếu chưa hẹn)
+    note TEXT,
     quantity INT NOT NULL DEFAULT 1,
     price_at_purchase DOUBLE NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE CASCADE
+    created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE CASCADE,
 );
 
 -- 11. Bảng pre_bookings: Đặt trước thú cưng
@@ -468,18 +472,18 @@ INSERT INTO order_items (order_item_id, order_id, pet_id, quantity, price_at_pur
 ('OI009', 'O001', 'P005', 1, 9000000, 1000000),
 ('OI010', 'O002', 'P003', 1, 15300000, 2700000);
 
--- Dữ liệu mẫu cho bảng order_services
-INSERT INTO order_services (order_service_id, order_id, service_id, quantity, price_at_purchase) VALUES
-('OS001', 'O001', 'S001', 1, 150000),
-('OS002', 'O003', 'S002', 1, 200000),
-('OS003', 'O004', 'S005', 1, 250000),
-('OS004', 'O007', 'S003', 1, 500000),
-('OS005', 'O001', 'S006', 1, 100000),
-('OS006', 'O002', 'S007', 1, 80000),
-('OS007', 'O003', 'S008', 1, 50000),
-('OS008', 'O005', 'S001', 1, 150000),
-('OS009', 'O006', 'S002', 1, 200000),
-('OS010', 'O008', 'S004', 1, 300000);
+-- Dữ liệu mẫu cho bảng booking_services
+INSERT INTO booking_services (booking_service_id, user_id, service_id, appointment_date, note, quantity, price_at_purchase, created_at, updated_at) VALUES
+('BS001', 'U001', 'S001', '2025-09-15 10:00:00.000000', 'Tắm cẩn thận cho thú cưng mới', 1, 150000, '2025-09-12 11:35:14.863664', '2025-09-12 11:35:14.863664'),
+('BS002', 'U004', 'S002', '2025-09-18 14:30:00.000000', 'Tỉa lông gọn gàng theo kiểu hiện đại', 1, 200000, '2025-09-12 11:35:15.123456', '2025-09-12 11:35:15.123456'),
+('BS003', 'U005', 'S005', NULL, 'Chờ xác nhận lịch kiểm tra sức khỏe', 1, 250000, '2025-09-12 11:35:15.234567', '2025-09-12 11:35:15.234567'),
+('BS004', 'U008', 'S003', '2025-09-22 15:00:00.000000', 'Huấn luyện cơ bản cho chó con', 1, 500000, '2025-09-12 11:35:15.345678', '2025-09-12 11:35:15.345678'),
+('BS005', 'U001', 'S006', '2025-09-25 11:00:00.000000', 'Tiêm phòng dại định kỳ', 1, 100000, '2025-09-12 11:35:15.456789', '2025-09-12 11:35:15.456789'),
+('BS006', 'U002', 'S007', NULL, 'Tẩy giun, chờ lịch cụ thể', 1, 80000, '2025-09-12 11:35:15.567890', '2025-09-12 11:35:15.567890'),
+('BS007', 'U004', 'S008', '2025-09-17 16:00:00.000000', 'Cắt móng nhẹ nhàng', 1, 50000, '2025-09-12 11:35:15.678901', '2025-09-12 11:35:15.678901'),
+('BS008', 'U006', 'S001', '2025-09-19 10:30:00.000000', 'Tắm thư giãn với tinh dầu', 1, 150000, '2025-09-12 11:35:15.789012', '2025-09-12 11:35:15.789012'),
+('BS009', 'U007', 'S002', '2025-09-21 12:00:00.000000', 'Tỉa lông đẹp cho giống lông dài', 1, 200000, '2025-09-12 11:35:15.890123', '2025-09-12 11:35:15.890123'),
+('BS010', 'U009', 'S004', NULL, 'Spa, sẽ xác nhận lịch sau', 1, 300000, '2025-09-12 11:35:15.901234', '2025-09-12 11:35:15.901234');
 
 -- Dữ liệu mẫu cho bảng pre_bookings
 INSERT INTO pre_bookings (booking_id, user_id, pet_id, deposit_amount, expected_date, status, created_at, updated_at) VALUES
