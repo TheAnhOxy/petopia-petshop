@@ -44,4 +44,13 @@ public class PromotionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(promotion);
     }
 
+    @PutMapping("/{id}/inactive")
+    public ResponseEntity<PromotionResponseDTO> inactivePromotion(@PathVariable String id) {
+        PromotionResponseDTO promotion = promotionService.inactivePromotion(id);
+        if (promotion == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(promotion);
+    }
+
 }

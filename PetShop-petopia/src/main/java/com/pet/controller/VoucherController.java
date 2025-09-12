@@ -1,5 +1,6 @@
 package com.pet.controller;
 
+import com.pet.modal.request.ApplyVoucherRequestDTO;
 import com.pet.modal.request.PromotionRequestDTO;
 import com.pet.modal.request.VoucherRequestDTO;
 import com.pet.modal.response.PageResponse;
@@ -44,4 +45,24 @@ public class VoucherController {
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(voucher);
     }
+
+    @PutMapping("/inactive/{voucherId}")
+    public ResponseEntity<VoucherResponseDTO> inactiveVoucher(@PathVariable String voucherId){
+        VoucherResponseDTO voucher = voucherService.inactiveVoucher(voucherId);
+        if (voucher == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(voucher);
+    }
+
+    @PostMapping("/apply")
+    public ResponseEntity<VoucherResponseDTO> applyVoucher(@RequestBody ApplyVoucherRequestDTO request){
+        request.validate();
+        VoucherResponseDTO voucher = voucherService.applyVoucher(request);
+        if (voucher == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.ok(voucher);
+    }
+
 }

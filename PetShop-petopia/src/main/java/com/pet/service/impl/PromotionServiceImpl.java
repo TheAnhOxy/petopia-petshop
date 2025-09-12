@@ -2,6 +2,7 @@ package com.pet.service.impl;
 
 import com.pet.converter.PromotionConverter;
 import com.pet.entity.Promotion;
+import com.pet.enums.PromotionVoucherStatus;
 import com.pet.modal.request.PromotionRequestDTO;
 import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PromotionResponseDTO;
@@ -65,5 +66,14 @@ public class PromotionServiceImpl implements PromotionService {
         promotion = promotionConverter.mapToEntity(request, promotion);
         Promotion savedPromotion = promotionRepository.save(promotion);
         return promotionConverter.mapToDTO(savedPromotion);
+    }
+
+    @Override
+    public PromotionResponseDTO inactivePromotion(String promoId) {
+        Promotion promotion = promotionRepository.findById(promoId)
+                .orElseThrow(() -> new RuntimeException("Promotion not found with id: " + promoId));
+        promotion.setStatus(PromotionVoucherStatus.INACTIVE);
+        Promotion updatedPromotion = promotionRepository.save(promotion);
+        return promotionConverter.mapToDTO(updatedPromotion);
     }
 }

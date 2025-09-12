@@ -8,4 +8,5 @@ public interface PromotionService {
     PromotionResponseDTO getPromotionByCode(String promoCode);
     PageResponse<PromotionResponseDTO> getAllPromotions(int page, int size);
     PromotionResponseDTO addOrUpdatePromotion(PromotionRequestDTO request);
+    PromotionResponseDTO inactivePromotion(String promoId);
 }

@@ -4,6 +4,7 @@ import com.pet.config.ModelMapperConfig;
 import com.pet.entity.Category;
 import com.pet.entity.Promotion;
 import com.pet.entity.Voucher;
+import com.pet.enums.PromotionVoucherStatus;
 import com.pet.exception.ResourceNotFoundException;
 import com.pet.modal.request.PromotionRequestDTO;
 import com.pet.modal.request.VoucherRequestDTO;
@@ -13,6 +14,8 @@ import com.pet.repository.VoucherRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 @Component
 public class VoucherConverter {
@@ -32,6 +35,25 @@ public class VoucherConverter {
             voucher.setVoucherId(generateVoucherId());
         }
         return voucher;
+    }
+
+    public void validateVoucher(Voucher voucher, Double orderAmount) {
+        LocalDate now = LocalDate.now();
+        if (voucher.getStatus() != PromotionVoucherStatus.ACTIVE) {
+            throw new RuntimeException("Voucher is not active");
+        }
+        if (voucher.getStartDate() != null && voucher.getStartDate().isAfter(now)) {
+            throw new RuntimeException("Voucher is not yet valid");
+        }
+        if (voucher.getEndDate() != null && voucher.getEndDate().isBefore(now)) {
+            throw new RuntimeException("Voucher has expired");
+        }
+        if (orderAmount != null && voucher.getMinOrderAmount() != null && orderAmount < voucher.getMinOrderAmount()) {
+            throw new RuntimeException("Order amount does not meet the minimum requirement for this voucher");
+        }
+        if (voucher.getMaxUsage() != null && voucher.getUsedCount() >= voucher.getMaxUsage()) {
+            throw new RuntimeException("Voucher usage limit has been reached");
+        }
     }
 
     private String generateVoucherId() {
