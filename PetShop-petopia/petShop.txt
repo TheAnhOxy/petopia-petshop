@@ -167,7 +167,7 @@ CREATE TABLE payments (
     payment_id VARCHAR(10) PRIMARY KEY, 
     order_id VARCHAR(10),
     amount DOUBLE NOT NULL,
-    payment_method ENUM('COD', 'BANK_TRANSFER', 'EWALLET', 'CREDIT_CARD') NOT NULL,
+    payment_method ENUM('COD', 'BANK_TRANSFER') NOT NULL,
     payment_status ENUM('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
     transaction_id VARCHAR(255),
     payment_url VARCHAR(255),
