@@ -4,29 +4,41 @@ import com.pet.modal.request.ArticleRequestDTO;
 import com.pet.modal.response.ArticleResponseDTO;
 import com.pet.modal.response.ApiResponse;
 import com.pet.service.ArticleService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/articles")
-@RequiredArgsConstructor
 public class ArticleController {
 
-    private final ArticleService articleService;
+    @Autowired
+    private ArticleService articleService;
 
+    // ✅ Tạo bài viết (chỉ ADMIN)
     @PostMapping
     public ResponseEntity<ApiResponse> createArticle(@RequestBody ArticleRequestDTO request) {
-        ArticleResponseDTO response = articleService.createArticle(request);
-        return ResponseEntity.ok(ApiResponse.builder()
-                .status(200)
-                .message("Article created successfully")
-                .data(response)
-                .build());
+        try {
+            ArticleResponseDTO response = articleService.createArticle(request);
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(200)
+                    .message("Article created successfully")
+                    .data(response)
+                    .build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(ApiResponse.builder()
+                    .status(403)
+                    .message(e.getMessage())
+                    .build());
+        }
     }
 
+    // ✅ Xem chi tiết bài viết (ai cũng được)
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse> getArticleById(@PathVariable String id) {
         ArticleResponseDTO response = articleService.getArticleById(id);
@@ -37,6 +49,8 @@ public class ArticleController {
                 .build());
     }
 
+
+    // ✅ Xem tất cả bài viết (ai cũng được)
     @GetMapping
     public ResponseEntity<ApiResponse> getAllArticles() {
         List<ArticleResponseDTO> responses = articleService.getAllArticles();
@@ -47,23 +61,67 @@ public class ArticleController {
                 .build());
     }
 
+    // ✅ Cập nhật bài viết (chỉ ADMIN)
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateArticle(@PathVariable String id,
                                                      @RequestBody ArticleRequestDTO request) {
-        ArticleResponseDTO response = articleService.updateArticle(id, request);
+        try {
+            ArticleResponseDTO response = articleService.updateArticle(id, request);
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(200)
+                    .message("Article updated successfully")
+                    .data(response)
+                    .build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(ApiResponse.builder()
+                    .status(403)
+                    .message(e.getMessage())
+                    .build());
+        }
+    }
+
+    // ✅ Xóa bài viết (chỉ ADMIN)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteArticle(@PathVariable String id,
+                                                     @RequestBody Map<String, String> body) {
+        try {
+            String authorId = body.get("authorId");
+            articleService.deleteArticle(id, authorId);
+            return ResponseEntity.ok(ApiResponse.builder()
+                    .status(200)
+                    .message("Article deleted successfully")
+                    .build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(ApiResponse.builder()
+                    .status(403)
+                    .message(e.getMessage())
+                    .build());
+        }
+    }
+    @GetMapping("/paged")
+    public ResponseEntity<ApiResponse> getAllArticlesPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) String keyword) {
+
+        Page<ArticleResponseDTO> responses = articleService.getAllArticlesPaged(page, size, sortBy, sortDir, keyword);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("articles", responses.getContent());
+        result.put("currentPage", responses.getNumber());
+        result.put("totalItems", responses.getTotalElements());
+        result.put("totalPages", responses.getTotalPages());
+
         return ResponseEntity.ok(ApiResponse.builder()
                 .status(200)
-                .message("Article updated successfully")
-                .data(response)
+                .message("Articles retrieved successfully with pagination and search")
+                .data(result)
                 .build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteArticle(@PathVariable String id) {
-        articleService.deleteArticle(id);
-        return ResponseEntity.ok(ApiResponse.builder()
-                .status(200)
-                .message("Article deleted successfully")
-                .build());
-    }
+
+
+
 }

@@ -1,15 +1,12 @@
-
 package com.pet.modal.response;
 
 import lombok.*;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Builder
 public class ArticleResponseDTO {
     private String articleId;
@@ -20,4 +17,7 @@ public class ArticleResponseDTO {
     private String authorName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // 🔥 Danh sách bình luận
+    private List<ArticleCommentResponseDTO> comments;
 }
