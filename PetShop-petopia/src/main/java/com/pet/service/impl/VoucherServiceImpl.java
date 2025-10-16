@@ -1,13 +1,11 @@
 package com.pet.service.impl;
 
 import com.pet.converter.VoucherConverter;
-import com.pet.entity.Promotion;
 import com.pet.entity.Voucher;
 import com.pet.enums.PromotionVoucherStatus;
 import com.pet.modal.request.ApplyVoucherRequestDTO;
 import com.pet.modal.request.VoucherRequestDTO;
 import com.pet.modal.response.PageResponse;
-import com.pet.modal.response.PromotionResponseDTO;
 import com.pet.modal.response.VoucherResponseDTO;
 import com.pet.repository.VoucherRepository;
 import com.pet.service.VoucherService;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

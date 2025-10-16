@@ -88,8 +88,4 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = false, fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<OrderPromotion> orderPromotions;
-
-    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = false, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    private Set<LoyaltyTransaction> loyaltyTransactions;
 }

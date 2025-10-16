@@ -10,9 +10,9 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
+    avatar VARCHAR(255), -- ảnh đại diện người dùng
     phone_number VARCHAR(255),
     role ENUM('CUSTOMER', 'ADMIN') DEFAULT 'CUSTOMER',
-    loyalty_points INT DEFAULT 0,
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
@@ -145,7 +145,7 @@ CREATE TABLE booking_services (
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE CASCADE
 );
 
 -- 11. Bảng pre_bookings: Đặt trước thú cưng
@@ -233,9 +233,11 @@ CREATE TABLE vouchers (
     max_usage INT,
     used_count INT DEFAULT 0,
     status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
+    image_url VARCHAR(255), -- ảnh đại diện cho voucher
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     INDEX idx_code (code)
 );
+
 
 -- 17. Bảng promotions: Khuyến mãi
 CREATE TABLE promotions (
@@ -327,20 +329,7 @@ CREATE TABLE notifications (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 24. Bảng loyalty_transactions: Giao dịch điểm thưởng
-CREATE TABLE loyalty_transactions (
-    transaction_id VARCHAR(10) PRIMARY KEY,
-    user_id VARCHAR(10),
-    order_id VARCHAR(10),
-    points_earned INT DEFAULT 0,
-    points_used INT DEFAULT 0,
-    description VARCHAR(255),
-    created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE SET NULL
-);
-
--- 25. Bảng search_history: Lưu trữ lịch sử tìm kiếm
+-- 24. Bảng search_history: Lưu trữ lịch sử tìm kiếm
 CREATE TABLE search_history (
     history_id VARCHAR(10) PRIMARY KEY,  
     user_id VARCHAR(10),
@@ -349,22 +338,44 @@ CREATE TABLE search_history (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+-- 25. Bảng vaccines: Lưu trữ thông tin vác xin tiêm chủng cho thú cưng
+CREATE TABLE vaccines (
+    vaccine_id VARCHAR(10) PRIMARY KEY,
+    user_id VARCHAR(10),                -- Liên kết đến bảng users (role = CUSTOMER)
+    pet_id VARCHAR(10),                 -- Liên kết đến bảng pets
+    vaccine_name VARCHAR(255) NOT NULL, -- Tên vaccine
+    vaccine_type VARCHAR(100),          -- Loại vaccine (virus, dại, 7 bệnh,...)
+    description TEXT,                   -- Mô tả chi tiết
+    file VARCHAR(255),                  -- File chứng nhận / hồ sơ tiêm
+    status ENUM('Đã tiêm', 'Chưa tiêm', 'Đang chờ') DEFAULT 'Chưa tiêm',
+    note TEXT,                          -- Ghi chú thêm
+    start_date DATETIME(6),             -- Thời gian bắt đầu (đăng ký hoặc tiêm)
+    end_date DATETIME(6),               -- Thời gian kết thúc / hạn tiếp theo
+    created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON DELETE CASCADE
+);
+
+
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 USE petshop;
 
 -- Dữ liệu mẫu cho bảng users
-INSERT INTO users (user_id, username, email, password_hash, full_name, phone_number, role, loyalty_points, is_active, created_at, updated_at) VALUES
-('U001', 'nguyen_van_a', 'nguyenvana@gmail.com', 'hashed_password_1', 'Nguyễn Văn A', '0901234567', 'CUSTOMER', 100, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U002', 'tran_thi_b', 'tranthib@gmail.com', 'hashed_password_2', 'Trần Thị B', '0902345678', 'CUSTOMER', 50, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U003', 'admin_petshop', 'admin@petshop.com', 'hashed_password_3', 'Quản Trị Petshop', '0903456789', 'ADMIN', 0, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U004', 'le_van_c', 'levanc@gmail.com', 'hashed_password_4', 'Lê Văn C', '0904567890', 'CUSTOMER', 200, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U005', 'pham_thi_d', 'phamthid@gmail.com', 'hashed_password_5', 'Phạm Thị D', '0905678901', 'CUSTOMER', 150, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U006', 'hoang_van_e', 'hoangvane@gmail.com', 'hashed_password_6', 'Hoàng Văn E', '0906789012', 'CUSTOMER', 80, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U007', 'vu_thi_f', 'vuthif@gmail.com', 'hashed_password_7', 'Vũ Thị F', '0907890123', 'CUSTOMER', 300, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U008', 'dang_van_g', 'dangvang@gmail.com', 'hashed_password_8', 'Đặng Văn G', '0908901234', 'CUSTOMER', 120, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U009', 'bui_thi_h', 'buithih@gmail.com', 'hashed_password_9', 'Bùi Thị H', '0909012345', 'CUSTOMER', 90, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('U010', 'ngo_van_i', 'ngovani@gmail.com', 'hashed_password_10', 'Ngô Văn I', '0900123456', 'CUSTOMER', 250, 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00');
+INSERT INTO users (user_id, username, email, password_hash, full_name, avatar, phone_number, role, is_active, created_at, updated_at) VALUES
+('U001', 'nguyen_van_a', 'nguyenvana@gmail.com', 'hashed_password_1', 'Nguyễn Văn A', 'https://i.imgur.com/avatar1.jpg', '0901234567', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U002', 'tran_thi_b', 'tranthib@gmail.com', 'hashed_password_2', 'Trần Thị B', 'https://i.imgur.com/avatar2.jpg', '0902345678', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U003', 'admin_petshop', 'admin@petshop.com', 'hashed_password_3', 'Quản Trị Petshop', 'https://i.imgur.com/avatar3.jpg', '0903456789', 'ADMIN', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U004', 'le_van_c', 'levanc@gmail.com', 'hashed_password_4', 'Lê Văn C', 'https://i.imgur.com/avatar4.jpg', '0904567890', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U005', 'pham_thi_d', 'phamthid@gmail.com', 'hashed_password_5', 'Phạm Thị D', 'https://i.imgur.com/avatar5.jpg', '0905678901', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U006', 'hoang_van_e', 'hoangvane@gmail.com', 'hashed_password_6', 'Hoàng Văn E', 'https://i.imgur.com/avatar6.jpg', '0906789012', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U007', 'vu_thi_f', 'vuthif@gmail.com', 'hashed_password_7', 'Vũ Thị F', 'https://i.imgur.com/avatar7.jpg', '0907890123', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U008', 'dang_van_g', 'dangvang@gmail.com', 'hashed_password_8', 'Đặng Văn G', 'https://i.imgur.com/avatar8.jpg', '0908901234', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U009', 'bui_thi_h', 'buithih@gmail.com', 'hashed_password_9', 'Bùi Thị H', 'https://i.imgur.com/avatar9.jpg', '0909012345', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('U010', 'ngo_van_i', 'ngovani@gmail.com', 'hashed_password_10', 'Ngô Văn I', 'https://i.imgur.com/avatar10.jpg', '0900123456', 'CUSTOMER', 1, '2025-08-11 14:26:00', '2025-08-11 14:26:00');
+
 
 -- Dữ liệu mẫu cho bảng addresses
 INSERT INTO addresses (address_id, user_id, street, ward, district, province, country, is_default, created_at, updated_at) VALUES
@@ -551,17 +562,21 @@ INSERT INTO delivery_history (history_id, delivery_id, status, description, loca
 ('DH010', 'D010', 'PREPARING', 'Đang chuẩn bị đơn hàng', 'Hà Nội', '2025-08-11 14:26:00');
 
 -- Dữ liệu mẫu cho bảng vouchers
-INSERT INTO vouchers (voucher_id, code, description, discount_type, discount_value, min_order_amount, start_date, end_date, max_usage, used_count, status, created_at) VALUES
-('V001', 'PET10', 'Giảm 10% cho đơn hàng', 'PERCENTAGE', 10, 10000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V002', 'PET200K', 'Giảm 200K cho đơn hàng', 'FIXED_AMOUNT', 200000, 5000000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V003', 'FREESHIP', 'Miễn phí vận chuyển', 'FIXED_AMOUNT', 150000, 5000000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V004', 'NEWUSER', 'Giảm 15% cho khách mới', 'PERCENTAGE', 15, 8000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V005', 'PET500K', 'Giảm 500K cho đơn hàng', 'FIXED_AMOUNT', 500000, 15000000, '2025-08-01', '2025-08-31', 50, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V006', 'CATLOVE', 'Giảm 10% cho mèo', 'PERCENTAGE', 10, 7000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V007', 'DOGLOVE', 'Giảm 10% cho chó', 'PERCENTAGE', 10, 7000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V008', 'VIP100', 'Giảm 100K cho khách VIP', 'FIXED_AMOUNT', 100000, 3000000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', '2025-08-11 14:26:00'),
-('V009', 'SUMMER25', 'Giảm 25% mùa hè', 'PERCENTAGE', 25, 20000000, '2025-08-01', '2025-08-31', 50, 0, 'INACTIVE', '2025-08-11 14:26:00'),
-('V010', 'PET50K', 'Giảm 50K cho dịch vụ', 'FIXED_AMOUNT', 50000, 200000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', '2025-08-11 14:26:00');
+INSERT INTO vouchers (
+    voucher_id, code, description, discount_type, discount_value, 
+    min_order_amount, start_date, end_date, max_usage, used_count, 
+    status, image_url, created_at
+) VALUES
+('V001', 'PET10', 'Giảm 10% cho đơn hàng', 'PERCENTAGE', 10, 10000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', 'https://i.imgur.com/1vOuWJg.jpg', '2025-08-11 14:26:00'),
+('V002', 'PET200K', 'Giảm 200K cho đơn hàng', 'FIXED_AMOUNT', 200000, 5000000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', 'https://i.imgur.com/4Jv8AqR.jpg', '2025-08-11 14:26:00'),
+('V003', 'FREESHIP', 'Miễn phí vận chuyển', 'FIXED_AMOUNT', 150000, 5000000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', 'https://i.imgur.com/sz1iA8R.jpg', '2025-08-11 14:26:00'),
+('V004', 'NEWUSER', 'Giảm 15% cho khách mới', 'PERCENTAGE', 15, 8000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', 'https://i.imgur.com/8muSVxx.jpg', '2025-08-11 14:26:00'),
+('V005', 'PET500K', 'Giảm 500K cho đơn hàng', 'FIXED_AMOUNT', 500000, 15000000, '2025-08-01', '2025-08-31', 50, 0, 'ACTIVE', 'https://i.imgur.com/N7nbfIT.jpg', '2025-08-11 14:26:00'),
+('V006', 'CATLOVE', 'Giảm 10% cho mèo', 'PERCENTAGE', 10, 7000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', 'https://i.imgur.com/hPO1hfj.jpg', '2025-08-11 14:26:00'),
+('V007', 'DOGLOVE', 'Giảm 10% cho chó', 'PERCENTAGE', 10, 7000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', 'https://i.imgur.com/SqvZVjv.jpg', '2025-08-11 14:26:00'),
+('V008', 'VIP100', 'Giảm 100K cho khách VIP', 'FIXED_AMOUNT', 100000, 3000000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', 'https://i.imgur.com/MgEOa2x.jpg', '2025-08-11 14:26:00'),
+('V009', 'SUMMER25', 'Giảm 25% mùa hè', 'PERCENTAGE', 25, 20000000, '2025-08-01', '2025-08-31', 50, 0, 'INACTIVE', 'https://i.imgur.com/nH1vDqx.jpg', '2025-08-11 14:26:00'),
+('V010', 'PET50K', 'Giảm 50K cho dịch vụ', 'FIXED_AMOUNT', 50000, 200000, '2025-08-01', '2025-08-31', 200, 0, 'ACTIVE', 'https://i.imgur.com/XVb2WUE.jpg', '2025-08-11 14:26:00');
 
 -- Dữ liệu mẫu cho bảng promotions
 INSERT INTO promotions (promotion_id, code, description, promotion_type, discount_value, min_order_amount, start_date, end_date, max_usage, used_count, status, category_id, image_url, created_at) VALUES
@@ -654,15 +669,17 @@ INSERT INTO notifications (notification_id, user_id, title, content, typeNote, i
 ('N009', 'U010', 'Đơn hàng O009 đang vận chuyển', 'Đơn hàng của bạn đang được vận chuyển, dự kiến giao ngày 2025-08-21.', 'ORDER_UPDATE', 0, '2025-08-11 14:26:00'),
 ('N010', 'U001', 'Bài viết mới', 'Xem bài viết mới về chăm sóc Poodle tại mục tin tức!', 'ORDER_UPDATE', 0, '2025-08-11 14:26:00');
 
--- Dữ liệu mẫu cho bảng loyalty_transactions
-INSERT INTO loyalty_transactions (transaction_id, user_id, order_id, points_earned, points_used, description, created_at) VALUES
-('LT001', 'U001', 'O001', 100, 0, 'Nhận 100 điểm từ đơn hàng O001', '2025-08-14 16:15:00.000000'),
-('LT002', 'U002', 'O002', 50, 0, 'Nhận 50 điểm từ đơn hàng O002', '2025-08-14 16:15:00.000000'),
-('LT003', 'U004', 'O003', 200, 0, 'Nhận 200 điểm từ đơn hàng O003', '2025-08-14 16:15:00.000000'),
-('LT004', 'U005', 'O004', 150, 0, 'Nhận 150 điểm từ đơn hàng O004', '2025-08-14 16:15:00.000000'),
-('LT005', 'U006', 'O005', 80, 0, 'Nhận 80 điểm từ đơn hàng O005', '2025-08-14 16:15:00.000000'),
-('LT006', 'U007', 'O006', 0, 50, 'Sử dụng 50 điểm để giảm giá đơn hàng O006', '2025-08-14 16:15:00.000000'),
-('LT007', 'U008', 'O007', 120, 0, 'Nhận 120 điểm từ đơn hàng O007', '2025-08-14 16:15:00.000000'),
-('LT008', 'U009', 'O008', 0, 100, 'Sử dụng 100 điểm để giảm giá đơn hàng O008', '2025-08-14 16:15:00.000000'),
-('LT009', 'U010', 'O009', 250, 0, 'Nhận 250 điểm từ đơn hàng O009', '2025-08-14 16:15:00.000000'),
-('LT010', 'U001', 'O010', 0, 100, 'Sử dụng 100 điểm để giảm giá đơn hàng O010', '2025-08-14 16:15:00.000000');
+-- Dữ liệu mẫu cho bảng vaccines
+INSERT INTO vaccines 
+(vaccine_id, user_id, pet_id, vaccine_name, vaccine_type, description, file, status, note, start_date, end_date)
+VALUES
+('V001', 'U001', 'P001', 'Vaccine Dại', 'Virus', 'Phòng bệnh dại cho chó', 'files/vaccine_rabies_P001.pdf', 'Đã tiêm', 'Tiêm mũi nhắc sau 1 năm', '2025-08-01 09:30:00', '2026-08-01 09:30:00'),
+('V002', 'U002', 'P002', 'Vaccine 7 bệnh', 'Tổng hợp', 'Phòng 7 bệnh phổ biến ở chó con', 'files/vaccine_7benh_P002.pdf', 'Đã tiêm', 'Theo dõi phản ứng 24h', '2025-07-20 10:00:00', '2026-07-20 10:00:00'),
+('V003', 'U003', 'P003', 'Vaccine Care', 'Virus', 'Phòng bệnh Care ở chó', 'files/vaccine_care_P003.pdf', 'Đang chờ', 'Chờ xác nhận lịch tiêm từ bác sĩ', '2025-10-10 00:00:00', NULL),
+('V004', 'U004', 'P004', 'Vaccine Parvo', 'Virus', 'Phòng bệnh Parvo', 'files/vaccine_parvo_P004.pdf', 'Chưa tiêm', 'Dự kiến tiêm trong tháng 10', NULL, NULL),
+('V005', 'U005', 'P005', 'Vaccine Leptospira', 'Vi khuẩn', 'Phòng bệnh do vi khuẩn Leptospira', 'files/vaccine_lepto_P005.pdf', 'Đã tiêm', 'Mũi đầu tiên đã hoàn thành', '2025-05-15 08:45:00', '2026-05-15 08:45:00'),
+('V006', 'U006', 'P006', 'Vaccine Dại', 'Virus', 'Phòng bệnh dại cho mèo', 'files/vaccine_rabies_cat_P006.pdf', 'Đã tiêm', 'Cần tiêm nhắc sau 1 năm', '2025-06-12 14:15:00', '2026-06-12 14:15:00'),
+('V007', 'U007', 'P007', 'Vaccine FVRCP', 'Tổng hợp', 'Phòng 3 bệnh cho mèo con', 'files/vaccine_fvrcp_P007.pdf', 'Đang chờ', 'Đặt lịch lại vì mưa', '2025-10-12 00:00:00', NULL),
+('V008', 'U008', 'P008', 'Vaccine Bordetella', 'Vi khuẩn', 'Phòng ho cũi ở chó', 'files/vaccine_bordetella_P008.pdf', 'Chưa tiêm', 'Chờ bác sĩ xác nhận', NULL, NULL),
+('V009', 'U009', 'P009', 'Vaccine Coronavirus', 'Virus', 'Phòng bệnh viêm ruột do Coronavirus', 'files/vaccine_corona_P009.pdf', 'Đã tiêm', 'Không có phản ứng phụ', '2025-04-02 13:20:00', '2026-04-02 13:20:00'),
+('V010', 'U010', 'P010', 'Vaccine Lyme', 'Vi khuẩn', 'Phòng bệnh Lyme do ve truyền', 'files/vaccine_lyme_P010.pdf', 'Chưa tiêm', 'Đang chờ lịch khám tổng quát', NULL, NULL);
