@@ -45,8 +45,7 @@ public class Payment {
     @Column(name = "payment_url", length = 255)
     private String paymentUrl;
 
-    @Lob
-    @Column(name = "payer_info", columnDefinition = "JSON")
+    @Column(name = "payer_info", length = 255)
     private String payerInfo;
 
     @Column(name = "payment_date", columnDefinition = "DATETIME(6)")
