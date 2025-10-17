@@ -171,7 +171,7 @@ CREATE TABLE payments (
     payment_status ENUM('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
     transaction_id VARCHAR(255),
     payment_url VARCHAR(255),
-    payer_info JSON,
+    payer_info VARCHAR(255),
     payment_date DATETIME(6),
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
@@ -407,7 +407,7 @@ INSERT INTO categories (category_id, name, description, parent_id, image_url, cr
 INSERT INTO pets (pet_id, name, description, category_id, age, gender, price, discount_price, health_status, vaccination_history, stock_quantity, status, video_url, weight, height, color, fur_type, created_at, updated_at) VALUES
 ('P001', 'Bông Poodle', 'Poodle lông xoăn, năng động', 'C003', 6, 'MALE', 15000000, 12000000, 'Khỏe mạnh', 'Tiêm phòng dại 2025-07-01', 1, 'AVAILABLE', 'poodle_video.mp4', 3.5, 30, 'Nâu', 'CURLY', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
 ('P002', 'Vàng Golden', 'Golden Retriever thông minh', 'C004', 8, 'FEMALE', 20000000, 18000000, 'Khỏe mạnh', 'Tiêm phòng tổng hợp 2025-06-15', 1, 'AVAILABLE', 'golden_video.mp4', 25, 55, 'Vàng', 'LONG', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('P003', 'Hắc Hổ Husky', 'Husky tinh nghịch, thích chạy', 'C005', 10, 'MALE', 18000000, 15300000, 'Khỏe mạnh', 'Tiêm phòng dại 2025-05-20', 1, 'RESERVED', 'husky_video.mp4', 20, 50, 'Đen trắng', 'LONG', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('P003', 'Hắc Hổ Husky', 'Husky tinh nghịch, thích chạy', 'C005', 10, 'MALE', 18000000, 15300000, 'Khỏe mạnh', 'Tiêm phòng dại 2025-05-20', 1, 'AVAILABLE', 'husky_video.mp4', 20, 50, 'Đen trắng', 'LONG', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
 ('P004', 'Miu Ba Tư', 'Mèo Ba Tư lông dài, dịu dàng', 'C006', 5, 'FEMALE', 12000000, 10800000, 'Khỏe mạnh', 'Tiêm phòng FVRCP 2025-07-10', 1, 'AVAILABLE', 'persian_video.mp4', 4, 25, 'Trắng', 'LONG', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
 ('P005', 'Tôm Anh Lông Ngắn', 'Mèo Anh Lông Ngắn đáng yêu', 'C007', 7, 'MALE', 10000000, 9000000, 'Khỏe mạnh', 'Tiêm phòng FVRCP 2025-06-25', 1, 'AVAILABLE', 'british_video.mp4', 4.5, 27, 'Xám', 'SHORT', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
 ('P006', 'Xiêm Xinh', 'Mèo Xiêm thanh lịch', 'C008', 6, 'FEMALE', 9000000, 8100000, 'Khỏe mạnh', 'Tiêm phòng FVRCP 2025-07-05', 1, 'AVAILABLE', 'siamese_video.mp4', 3.8, 26, 'Kem', 'SHORT', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
@@ -459,16 +459,16 @@ INSERT INTO wishlists (wishlist_id, user_id, pet_id, added_at) VALUES
 
 -- Dữ liệu mẫu cho bảng orders
 INSERT INTO orders (order_id, user_id, address_id, total_amount, status, payment_status, desired_delivery_date, note, phone_number, shipping_fee, discount_amount, created_at, updated_at) VALUES
-('O001', 'U001', 'A001', 12150000, 'PENDING', 'UNPAID', '2025-08-15', 'Giao cẩn thận', '0901234567', 150000, 3000000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O002', 'U002', 'A002', 18000000, 'CONFIRMED', 'PAID', '2025-08-16', NULL, '0902345678', 0, 2000000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O003', 'U004', 'A004', 11000000, 'SHIPPED', 'PAID', '2025-08-17', 'Giao nhanh', '0904567890', 200000, 1200000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O004', 'U005', 'A005', 250000, 'DELIVERED', 'PAID', '2025-08-14', NULL, '0905678901', 0, 0, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O005', 'U006', 'A006', 8250000, 'PENDING', 'UNPAID', '2025-08-18', NULL, '0906789012', 0, 900000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O006', 'U007', 'A007', 10650000, 'CONFIRMED', 'PAID', '2025-08-19', 'Gói kỹ', '0907890123', 0, 550000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O007', 'U008', 'A008', 500000, 'DELIVERED', 'PAID', '2025-08-13', NULL, '0908901234', 0, 0, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O008', 'U009', 'A009', 13500000, 'PENDING', 'UNPAID', '2025-08-20', NULL, '0909012345', 0, 1500000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O009', 'U010', 'A010', 19800000, 'SHIPPED', 'PAID', '2025-08-21', 'Giao buổi sáng', '0900123456', 0, 2200000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('O010', 'U001', 'A001', 11300000, 'PENDING', 'UNPAID', '2025-08-22', NULL, '0901234567', 0, 2800000, '2025-08-11 14:26:00', '2025-08-11 14:26:00');
+('O001', 'U001', 'A001', 8150000, 'PENDING', 'UNPAID', '2025-08-15', 'Giao cẩn thận', '0901234567', 150000, 4000000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O002', 'U002', 'A002', 30600000, 'CONFIRMED', 'PAID', '2025-08-16', NULL, '0902345678', 0, 4700000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O003', 'U004', 'A004', 11000000, 'SHIPPED', 'PAID', '2025-08-17', 'Giao nhanh', '0904567890', 200000, 2280000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O004', 'U005', 'A005', 250000, 'DELIVERED', 'PAID', '2025-08-14', NULL, '0905678901', 0, 150000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O005', 'U006', 'A006', 8250000, 'PENDING', 'UNPAID', '2025-08-18', NULL, '0906789012', 0, 1710000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O006', 'U007', 'A007', 9900000, 'CONFIRMED', 'PAID', '2025-08-19', 'Gói kỹ', '0907890123', 0, 1595000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O007', 'U008', 'A008', 400000, 'DELIVERED', 'PAID', '2025-08-13', NULL, '0908901234', 0, 100000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O008', 'U009', 'A009', 12150000, 'PENDING', 'UNPAID', '2025-08-20', NULL, '0909012345', 0, 2850000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O009', 'U010', 'A010', 17600000, 'SHIPPED', 'PAID', '2025-08-21', 'Giao buổi sáng', '0900123456', 0, 4180000, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('O010', 'U001', 'A001', 8400000, 'PENDING', 'UNPAID', '2025-08-22', NULL, '0901234567', 0, 3920000, '2025-08-11 14:26:00', '2025-08-11 14:26:00');
 
 -- Dữ liệu mẫu cho bảng order_items
 INSERT INTO order_items (order_item_id, order_id, pet_id, quantity, price_at_purchase, discount_applied) VALUES
@@ -511,16 +511,16 @@ INSERT INTO pre_bookings (booking_id, user_id, pet_id, deposit_amount, expected_
 
 -- Dữ liệu mẫu cho bảng payments
 INSERT INTO payments (payment_id, order_id, amount, payment_method, payment_status, transaction_id, payment_url, payer_info, payment_date, created_at, updated_at) VALUES
-('PM001', 'O001', 12150000, 'BANK_TRANSFER', 'PENDING', 'TX001', NULL, '{"name": "Nguyễn Văn A"}', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('PM002', 'O002', 18000000, 'CREDIT_CARD', 'SUCCESS', 'TX002', NULL, '{"name": "Trần Thị B"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('PM003', 'O003', 11000000, 'EWALLET', 'SUCCESS', 'TX003', NULL, '{"name": "Lê Văn C"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('PM001', 'O001', 8150000, 'BANK_TRANSFER', 'PENDING', 'TX001', NULL, '{"name": "Nguyễn Văn A"}', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('PM002', 'O002', 30600000, 'BANK_TRANSFER', 'SUCCESS', 'TX002', NULL, '{"name": "Trần Thị B"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('PM003', 'O003', 11000000, 'BANK_TRANSFER', 'SUCCESS', 'TX003', NULL, '{"name": "Lê Văn C"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
 ('PM004', 'O004', 250000, 'COD', 'SUCCESS', 'TX004', NULL, '{"name": "Phạm Thị D"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
 ('PM005', 'O005', 8250000, 'BANK_TRANSFER', 'PENDING', 'TX005', NULL, '{"name": "Hoàng Văn E"}', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('PM006', 'O006', 10650000, 'CREDIT_CARD', 'SUCCESS', 'TX006', NULL, '{"name": "Vũ Thị F"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('PM007', 'O007', 500000, 'COD', 'SUCCESS', 'TX007', NULL, '{"name": "Đặng Văn G"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('PM008', 'O008', 13500000, 'EWALLET', 'PENDING', 'TX008', NULL, '{"name": "Bùi Thị H"}', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('PM009', 'O009', 19800000, 'CREDIT_CARD', 'SUCCESS', 'TX009', NULL, '{"name": "Ngô Văn I"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('PM010', 'O010', 11300000, 'BANK_TRANSFER', 'PENDING', 'TX010', NULL, '{"name": "Nguyễn Văn A"}', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00');
+('PM006', 'O006', 9900000, 'BANK_TRANSFER', 'SUCCESS', 'TX006', NULL, '{"name": "Vũ Thị F"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('PM007', 'O007', 400000, 'COD', 'SUCCESS', 'TX007', NULL, '{"name": "Đặng Văn G"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('PM008', 'O008', 12150000, 'BANK_TRANSFER', 'PENDING', 'TX008', NULL, '{"name": "Bùi Thị H"}', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('PM009', 'O009', 17600000, 'BANK_TRANSFER', 'SUCCESS', 'TX009', NULL, '{"name": "Ngô Văn I"}', '2025-08-11 14:26:00', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
+('PM010', 'O010', 8400000, 'BANK_TRANSFER', 'PENDING', 'TX010', NULL, '{"name": "Nguyễn Văn A"}', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00');
 
 -- Dữ liệu mẫu cho bảng delivery_providers
 INSERT INTO delivery_providers (provider_id, name, description, contact_phone, contact_email, api_endpoint, is_active, created_at) VALUES
@@ -595,14 +595,14 @@ INSERT INTO promotions (promotion_id, code, description, promotion_type, discoun
 INSERT INTO order_vouchers (order_voucher_id, order_id, voucher_id, discount_applied) VALUES
 ('OV001', 'O004', 'V003', 150000),
 ('OV002', 'O007', 'V008', 100000),
-('OV003', 'O001', 'V006', 1200000),
+('OV003', 'O001', 'V007', 1200000),
 ('OV004', 'O002', 'V007', 1800000),
 ('OV005', 'O003', 'V006', 1080000),
 ('OV006', 'O005', 'V006', 810000),
 ('OV007', 'O006', 'V007', 1045000),
 ('OV008', 'O008', 'V006', 1350000),
 ('OV009', 'O009', 'V007', 1980000),
-('OV010', 'O010', 'V006', 1120000);
+('OV010', 'O010', 'V007', 1120000);
 
 -- Dữ liệu mẫu cho bảng order_promotions
 INSERT INTO order_promotions (order_promotion_id, order_id, promotion_id, discount_applied) VALUES
