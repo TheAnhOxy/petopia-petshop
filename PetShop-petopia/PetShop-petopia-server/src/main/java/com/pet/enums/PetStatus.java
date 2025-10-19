@@ -1,0 +1,7 @@
+package com.pet.enums;
+
+public enum PetStatus {
+    AVAILABLE, // Thú cưng sẵn sàng để mua
+    SOLD, // Thú cưng đã bán
+    DRAFT // Thú cưng ở chế độ nháp, chưa công khai
+}
