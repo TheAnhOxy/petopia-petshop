@@ -40,7 +40,7 @@ public class Pet {
     private Integer age;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", columnDefinition = "ENUM('MALE','FEMALE','UNKNOWN') DEFAULT 'UNKNOWN'")
+    @Column(name = "gender", columnDefinition = "ENUM('MALE','FEMALE') DEFAULT 'MALE'")
     private PetGender gender;
 
     @Column(name = "price", nullable = false)
@@ -60,7 +60,7 @@ public class Pet {
     private Integer stockQuantity;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", columnDefinition = "ENUM('AVAILABLE','SOLD','RESERVED','DRAFT') DEFAULT 'DRAFT'")
+    @Column(name = "status", columnDefinition = "ENUM('AVAILABLE','SOLD','DRAFT') DEFAULT 'DRAFT'")
     private PetStatus status;
 
     @Column(name = "video_url")
@@ -106,4 +106,8 @@ public class Pet {
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<Review> reviews;
+
+    @OneToMany(mappedBy = "pet", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Vaccin> vaccines;
 }
