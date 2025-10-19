@@ -2,7 +2,6 @@ package com.pet.entity;
 
 
 import com.pet.enums.PromotionType;
-import com.pet.enums.PromotionVoucherStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -50,10 +49,6 @@ public class Promotion {
 
     @Column(name = "used_count", columnDefinition = "INT DEFAULT 0")
     private Integer usedCount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "ENUM('ACTIVE','INACTIVE') DEFAULT 'ACTIVE'")
-    private PromotionVoucherStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

@@ -30,9 +30,6 @@ public class Service {
     @Column(name = "price", nullable = false)
     private Double price;
 
-    @Column(name = "image_url")
-    private String imageUrl;
-
     @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)", updatable = false)
     private LocalDateTime createdAt;
@@ -43,5 +40,5 @@ public class Service {
 
     @OneToMany(mappedBy = "service", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = false)
     @ToString.Exclude
-    private Set<BookingService> bookingServices;
+    private Set<OrderService> orderServices;
 }
