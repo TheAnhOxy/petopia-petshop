@@ -2,7 +2,6 @@ package com.pet.entity;
 
 
 
-import com.pet.enums.PromotionVoucherStatus;
 import lombok.*;
 import com.pet.enums.VoucherDiscountType;
 import jakarta.persistence.*;
@@ -51,13 +50,6 @@ public class Voucher {
 
     @Column(name = "used_count", columnDefinition = "INT DEFAULT 0")
     private Integer usedCount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "ENUM('ACTIVE','INACTIVE') DEFAULT 'ACTIVE'")
-    private PromotionVoucherStatus status;
-
-    @Column(name = "image_url")
-    private String imageUrl;
 
     @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)", updatable = false)

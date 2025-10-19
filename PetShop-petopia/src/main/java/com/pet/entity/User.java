@@ -32,15 +32,15 @@ public class User {
     @Column(name = "full_name", length = 255)
     private String fullName;
 
-    @Column(name = "avatar", length = 255)
-    private String avatar;
-
     @Column(name = "phone_number", length = 255)
     private String phoneNumber;
 
     @Column(name = "role", columnDefinition = "ENUM('CUSTOMER','ADMIN') DEFAULT 'CUSTOMER'")
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @Column(name = "loyalty_points", columnDefinition = "INT DEFAULT 0")
+    private Integer loyaltyPoints;
 
     @Column(name = "is_active", columnDefinition = "TINYINT(1) DEFAULT 1")
     private Boolean isActive;
@@ -86,7 +86,7 @@ public class User {
     private Set<Notification> notifications;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch =FetchType.LAZY)
-    private Set<Vaccin> vaccines;
+    private Set<LoyaltyTransaction> loyaltyTransactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
