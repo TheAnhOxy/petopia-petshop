@@ -1,4 +1,4 @@
-package com.pet.controller;
+package com.pet.controller.admin;
 
 import com.pet.modal.response.CategoryResponseDTO;
 import com.pet.service.CategoryService;
