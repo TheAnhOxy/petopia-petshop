@@ -1,1 +1,0 @@
-export type Contact = import("@/server/routers/contact").Contact;
