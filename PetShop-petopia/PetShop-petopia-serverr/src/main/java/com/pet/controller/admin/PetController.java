@@ -1,4 +1,4 @@
-package com.pet.controller;
+package com.pet.controller.admin;
 
 import com.pet.entity.Pet;
 import com.pet.modal.request.PetRequestDTO;
@@ -17,11 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.ACCEPTED;
-
 @RestController
 @Slf4j
-@RequestMapping("/pets")
+@RequestMapping("admin/pets")
 public class PetController {
 
     @Autowired

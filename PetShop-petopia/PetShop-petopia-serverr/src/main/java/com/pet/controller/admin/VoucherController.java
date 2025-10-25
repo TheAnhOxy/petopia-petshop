@@ -1,12 +1,9 @@
-package com.pet.controller;
+package com.pet.controller.admin;
 
 import com.pet.modal.request.ApplyVoucherRequestDTO;
-import com.pet.modal.request.PromotionRequestDTO;
 import com.pet.modal.request.VoucherRequestDTO;
 import com.pet.modal.response.PageResponse;
-import com.pet.modal.response.PromotionResponseDTO;
 import com.pet.modal.response.VoucherResponseDTO;
-import com.pet.service.PromotionService;
 import com.pet.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
