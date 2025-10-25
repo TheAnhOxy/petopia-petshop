@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -40,6 +41,8 @@ public class PetServiceImpl implements PetService {
         List<Pet> pets = petRepository.findAll();
         return pets;
     }
+
+
 
     @Override
     public PetResponseDTO getPetById(String petId) {
@@ -107,6 +110,18 @@ public class PetServiceImpl implements PetService {
         pet.setUpdatedAt(LocalDateTime.now());
         Pet savedPet = petRepository.save(pet);
         return petConverter.mapToDTO(savedPet);
+    }
+
+    @Override
+    public PageResponse<PetForListResponseDTO> getAllPetsList(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Pet> petPage = petRepository.findAll(pageable);
+
+        List<PetForListResponseDTO> dtoList = petPage.getContent().stream()
+                .map(petConverter::convertToDto)
+                .collect(Collectors.toList());
+
+        return petConverter.toPageResponseFromList(dtoList, petPage.getNumber(), petPage.getSize(), petPage.getTotalElements());
     }
 
     private String getSortField(String sortBy) {

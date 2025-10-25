@@ -6,9 +6,10 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
-    <groupId>pet.com</groupId>
+    <groupId>com.pet</groupId>
+
     <artifactId>Website_Pet</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Website_Pet</name>

@@ -38,44 +38,6 @@ public class PetController {
         return petService.getPets();
     }
 
-//    @Autowired
-//    private ProductService productService;
-
-//    @PostMapping
-//    public ApiResponse createOrUpdateProduct(@RequestBody ProductRequestDTO productRequestDTO){
-//        return ApiResponse.builder()
-//                .status(HttpStatus.CREATED.value())
-//                .message("Create product successfully")
-//                .data(Map.of("productId", productService.createProduct(productRequestDTO).getProductId()))
-//                .build();
-//    }
-//
-//    @DeleteMapping("{id}")
-//    public ApiResponse deleteProduct(@PathVariable String id){
-//        productService.deleteProduct(id);
-//        return ApiResponse.builder()
-//                .status(ACCEPTED.value())
-//                .message("Delete product successfully")
-//                .build();
-//    }
-//
-//    @PostMapping("/search")
-//    public ResponseEntity<PageResponse<ProductDTO>> advanceSearch(@RequestBody ProductSearchRequest request) {
-//        log.info("Search transaction");
-//
-//        request.validate();
-//
-//        System.out.println("Search transaction");
-//
-//        PageResponse<ProductDTO> result = productService.advanceSearch(request);
-//
-//        if (result.getContent() == null || result.getContent().isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        return ResponseEntity.ok(result);
-//    }
-
     @GetMapping("/{id}")
     public ResponseEntity<PetResponseDTO> getPetById(@PathVariable String id) {
         PetResponseDTO pet = petService.getPetById(id);
@@ -109,6 +71,8 @@ public class PetController {
         }
         return ResponseEntity.ok(pets);
     }
+
+
 
     // Phương thức dành cho web
     @GetMapping("/available")
@@ -151,6 +115,18 @@ public class PetController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok(pet);
+    }
+
+    @GetMapping("/getList")
+    public ResponseEntity<PageResponse<PetForListResponseDTO>> getAllPetsList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<PetForListResponseDTO> pets = petService.getAllPetsList(page, size);
+        if (pets == null || pets.getContent().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(pets);
     }
 
 }

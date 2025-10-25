@@ -3,7 +3,7 @@ import lombok.*;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor //Dùng khi load chi tiết 1 Pet
+@NoArgsConstructor
 public class PetResponseDTO {
     private String petId;
     private String name;

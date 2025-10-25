@@ -13,6 +13,7 @@ import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PetForListResponseDTO;
 import com.pet.modal.response.PetResponseDTO;
 import com.pet.repository.CategoryRepository;
+import com.pet.repository.OrderItemRepository;
 import com.pet.repository.PetImageRepository;
 import com.pet.repository.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class PetConverter {
     private PetRepository petRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     public PetForListResponseDTO mapToPetForListDTO(Pet pet) {
         return mapPet(pet, PetForListResponseDTO.class);
@@ -41,14 +44,38 @@ public class PetConverter {
         return mapPet(pet, PetResponseDTO.class);
     }
 
+    public PetForListResponseDTO mapToPetListDTO(Pet pet) {
+        return mapPet(pet, PetForListResponseDTO.class);
+    }
+
+    public PageResponse<PetForListResponseDTO> toPageResponseFromList(
+            List<PetForListResponseDTO> dtoList, int page, int size, long totalElements) {
+        PageResponse<PetForListResponseDTO> response = new PageResponse<>();
+        response.setContent(dtoList);
+        response.setPage(page);
+        response.setSize(size);
+        response.setTotalElements(totalElements);
+        return response;
+    }
+
+
+    public PetForListResponseDTO convertToDto(Pet pet){
+        PetForListResponseDTO petListResponseDTO = modelMapper.getModelMapper().map(pet, PetForListResponseDTO.class);
+        Category category = categoryRepository.findById(pet.getCategory().getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found") );
+        petListResponseDTO.setCategoryName(category.getName());
+        Long totalSold = orderItemRepository.sumQuantityByPet(pet);
+        petListResponseDTO.setTotalSold(totalSold != null ? totalSold : 0L);
+        return petListResponseDTO;
+    }
+
     public Pet mapToEntity(PetRequestDTO dto, Pet pet) {
-        pet.setCategory(null); //Ngăn ModelMapper tự map category
+        pet.setCategory(null);
         modelMapper.getModelMapper().map(dto, pet);
 
         if( pet.getPetId() != null) {
             pet.setStatus(PetStatus.valueOf(dto.getStatus().toUpperCase()));
         }else{
-            pet.setPetId(generatePetId()); //Hoặc UUID.randomUUID().toString()
+            pet.setPetId(generatePetId());
             pet.setStatus(PetStatus.AVAILABLE);
         }
         if (dto.getFurType() != null) {
@@ -88,6 +115,19 @@ public class PetConverter {
     public PageResponse<PetForListResponseDTO> toPageResponse(Page<Pet> petPage) {
         List<PetForListResponseDTO> petDTOs = petPage.getContent().stream()
                 .map(this::mapToPetForListDTO)
+                .toList();
+
+        PageResponse<PetForListResponseDTO> response = new PageResponse<>();
+        response.setContent(petDTOs);
+        response.setPage(petPage.getNumber());
+        response.setSize(petPage.getSize());
+        response.setTotalElements(petPage.getTotalElements());
+        return response;
+    }
+
+    public PageResponse<PetForListResponseDTO> toPageResponseList(Page<Pet> petPage) {
+        List<PetForListResponseDTO> petDTOs = petPage.getContent().stream()
+                .map(this::mapToPetListDTO)
                 .toList();
 
         PageResponse<PetForListResponseDTO> response = new PageResponse<>();

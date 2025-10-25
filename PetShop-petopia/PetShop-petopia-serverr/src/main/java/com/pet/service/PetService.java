@@ -20,4 +20,5 @@ public interface PetService {
     PageResponse<PetForListResponseDTO> advanceSearch(PetSearchRequestDTO request);
     PetResponseDTO addOrUpdatePet(PetRequestDTO request);
     PetResponseDTO inactivePet(String petId);
+    PageResponse<PetForListResponseDTO> getAllPetsList(int page, int size);
 }
