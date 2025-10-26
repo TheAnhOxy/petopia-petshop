@@ -37,5 +37,15 @@ public class PetWebController {
         return ResponseEntity.ok(pets);
     }
 
+    @PostMapping("/search")
+    public ResponseEntity<PageResponse<PetForListResponseDTO>> searchPets(@RequestBody PetSearchRequestDTO request) {
+        request.validate();
+        PageResponse<PetForListResponseDTO> result = petService.advanceSearch(request);
+        if (result == null || result.getContent().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(result);
+    }
+
 
 }
