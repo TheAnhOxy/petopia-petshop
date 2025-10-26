@@ -24,6 +24,8 @@ public class PetSearchRequestDTO {
     private Integer pageSize;
     private String sortBy;
     private String sortDirection; // "asc" or "desc"
+    private Double minFinalPrice;
+    private Double maxFinalPrice;
 
     public void validate() {
         if(minPrice != null && maxPrice != null && minPrice > maxPrice) {
