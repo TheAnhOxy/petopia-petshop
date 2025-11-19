@@ -119,21 +119,31 @@ public class PetServiceImpl implements PetService {
     private void handlePetImages(Pet pet, List<PetImageDTO> imageDTOs) {
         Set<PetImage> newImages = new HashSet<>();
         for (PetImageDTO imgDto : imageDTOs) {
-            PetImage image = new PetImage();
-            if(imgDto.getId() != null){
-                image = petImageRepository.findById(imgDto.getId()).orElse(new PetImage());
+            PetImage image;
+            if (imgDto.getId() != null) {
+                image = petImageRepository.findById(imgDto.getId())
+                        .orElse(new PetImage());
             } else {
-                image.setImageId(UUID.randomUUID().toString().substring(0, 10));
+                image = new PetImage();
+                image.setImageId(generatePetImageId());
                 image.setCreatedAt(LocalDateTime.now());
             }
+
             image.setPet(pet);
             image.setImageUrl(imgDto.getImageUrl());
             image.setIsThumbnail(imgDto.getIsThumbnail());
+
             petImageRepository.save(image);
             newImages.add(image);
         }
         pet.setImages(newImages);
     }
+
+    private String generatePetImageId() {
+        long count = petImageRepository.count() + 1;
+        return String.format("PI%03d", count);
+    }
+
 
     @Override
     @Transactional
