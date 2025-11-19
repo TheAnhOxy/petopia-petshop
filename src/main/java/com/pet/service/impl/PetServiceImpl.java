@@ -117,31 +117,29 @@ public class PetServiceImpl implements PetService {
     }
 
     private void handlePetImages(Pet pet, List<PetImageDTO> imageDTOs) {
-        Set<PetImage> newImages = new HashSet<>();
-        for (PetImageDTO imgDto : imageDTOs) {
-            PetImage image;
-            if (imgDto.getId() != null) {
-                image = petImageRepository.findById(imgDto.getId())
-                        .orElse(new PetImage());
-            } else {
-                image = new PetImage();
-                image.setImageId(generatePetImageId());
-                image.setCreatedAt(LocalDateTime.now());
-            }
+        pet.getImages().clear();
 
+        for (PetImageDTO imgDto : imageDTOs) {
+            PetImage image = new PetImage();
+            image.setImageId("IMG" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase());
             image.setPet(pet);
             image.setImageUrl(imgDto.getImageUrl());
-            image.setIsThumbnail(imgDto.getIsThumbnail());
+            image.setIsThumbnail(Boolean.TRUE.equals(imgDto.getIsThumbnail()));
+            image.setCreatedAt(LocalDateTime.now());
 
-            petImageRepository.save(image);
-            newImages.add(image);
+            pet.getImages().add(image);
         }
-        pet.setImages(newImages);
     }
 
-    private String generatePetImageId() {
-        long count = petImageRepository.count() + 1;
-        return String.format("PI%03d", count);
+
+
+    private String generateNextPetImageId() {
+        String maxId = petImageRepository.findMaxImageId();
+        int next = 1;
+        if (maxId != null && maxId.startsWith("PI")) {
+            next = Integer.parseInt(maxId.substring(2)) + 1;
+        }
+        return String.format("PI%03d", next);
     }
 
 

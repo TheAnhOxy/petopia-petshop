@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -71,28 +72,35 @@ public class PetConverter {
     }
 
     public Pet mapToEntity(PetRequestDTO dto, Pet pet) {
-        pet.setCategory(null);
-        modelMapper.getModelMapper().map(dto, pet);
+        Set<PetImage> oldImages = pet.getImages();
 
-        if( pet.getPetId() != null) {
+        modelMapper.getModelMapper().map(dto, pet);
+        pet.setImages(oldImages);
+
+        if (pet.getPetId() != null) {
             pet.setStatus(PetStatus.valueOf(dto.getStatus().toUpperCase()));
-        }else{
+        } else {
             pet.setPetId(generatePetId());
             pet.setStatus(PetStatus.AVAILABLE);
         }
+
         if (dto.getFurType() != null) {
             pet.setFurType(PetFurType.valueOf(dto.getFurType().toUpperCase()));
         }
+
         if (dto.getGender() != null) {
             pet.setGender(PetGender.valueOf(dto.getGender().toUpperCase()));
         }
+
         if (dto.getCategoryId() != null) {
             Category category = categoryRepository.findById(dto.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + dto.getCategoryId()));
             pet.setCategory(category);
         }
+
         return pet;
     }
+
 
     private <T> T mapPet(Pet pet, Class<T> dtoClass) {
         T dto = modelMapper.getModelMapper().map(pet, dtoClass);
