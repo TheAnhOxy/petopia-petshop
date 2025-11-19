@@ -25,6 +25,11 @@ public class Review {
     @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
 
+    private LocalDateTime replyDate;
+
+    @Column(columnDefinition = "TEXT")
+    private String reply;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
     @JoinColumn(name = "user_id")
