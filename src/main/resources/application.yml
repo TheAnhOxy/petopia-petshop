@@ -42,6 +42,9 @@ logging:
 #    org.apache.commons: DEBUG
     org.springframework.data.repository: DEBUG
 
+jwt:
+  secretKey: YXNkZmFzZGZhc2RmYXNkZmFzZGZhc2Rm
+  expiration: 86400
 
 dev:
   nguyen: Nguyen-The-Anh
