@@ -26,14 +26,9 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Public Endpoints (Login, Register, Public Data)
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
-
-                        // Admin Endpoints
                         .requestMatchers("/admin/**").hasRole(UserRole.ADMIN.name())
-
-                        // Customer Endpoints
                         .requestMatchers("/orders/**").hasAnyRole(UserRole.CUSTOMER.name(), UserRole.ADMIN.name())
                         .anyRequest().authenticated()
                 )
