@@ -3,7 +3,7 @@ package com.pet.repository.spec;
 import com.pet.entity.Pet;
 import com.pet.entity.Review;
 import com.pet.enums.SearchOperation;
-import com.pet.modal.request.PetSearchRequestDTO;
+import com.pet.modal.search.PetSearchRequestDTO;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 import static com.pet.enums.SearchOperation.GREATER_THAN_OR_EQUAL;

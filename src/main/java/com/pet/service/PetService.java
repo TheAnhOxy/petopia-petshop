@@ -2,7 +2,7 @@ package com.pet.service;
 
 import com.pet.entity.Pet;
 import com.pet.modal.request.PetRequestDTO;
-import com.pet.modal.request.PetSearchRequestDTO;
+import com.pet.modal.search.PetSearchRequestDTO;
 import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PetForListResponseDTO;
 import com.pet.modal.response.PetResponseDTO;
@@ -21,4 +21,5 @@ public interface PetService {
     PetResponseDTO addOrUpdatePet(PetRequestDTO request);
     PetResponseDTO inactivePet(String petId);
     PageResponse<PetForListResponseDTO> getAllPetsList(int page, int size);
+    void deletePetPermanent(String petId);
 }

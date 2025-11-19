@@ -84,18 +84,13 @@ public class VoucherServiceImpl implements VoucherService {
                 .orElseThrow(() -> new RuntimeException("Voucher not found with code: " + request.getVoucherCode()));
 
         voucherConverter.validateVoucher(voucher, request.getOrderAmount());
-
-        // Trả về thông tin voucher mà không áp dụng thực sự (chưa tăng usedCount)
         return voucherConverter.mapToDTO(voucher);
     }
 
-    // Xác nhận áp dụng voucher sau khi thanh toán đơn hàng thành công
     @Transactional
     public VoucherResponseDTO confirmVoucherApplication(String voucherCode, String orderId) {
         Voucher voucher = voucherRepository.findByCode(voucherCode)
                 .orElseThrow(() -> new RuntimeException("Voucher not found with code: " + voucherCode));
-
-        // Áp dụng thực sự (tăng usedCount, set trạng thái nếu cần)
         voucher.setUsedCount(voucher.getUsedCount() + 1);
 
         if(voucher.getMaxUsage() != null && voucher.getUsedCount() >= voucher.getMaxUsage()) {

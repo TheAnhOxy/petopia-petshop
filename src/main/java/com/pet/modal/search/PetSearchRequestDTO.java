@@ -1,4 +1,4 @@
-package com.pet.modal.request;
+package com.pet.modal.search;
 
 import lombok.Data;
 
@@ -17,13 +17,13 @@ public class PetSearchRequestDTO {
     private Double minHeight;
     private Double maxHeight;
     private Double minRating;
-    private Boolean onSale; // Có giảm giá (discountPrice < price)
+    private Boolean onSale;
     private String color;
     private String furType;
-    private Integer page;
-    private Integer pageSize;
-    private String sortBy;
-    private String sortDirection; // "asc" or "desc"
+    private Integer page = 0;
+    private Integer pageSize = 10;
+    private String sortBy = "created_at";;
+    private String sortDirection = "desc";
 
     public void validate() {
         if(minPrice != null && maxPrice != null && minPrice > maxPrice) {

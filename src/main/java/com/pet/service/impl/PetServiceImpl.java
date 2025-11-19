@@ -1,17 +1,20 @@
 package com.pet.service.impl;
 
+import com.pet.converter.PetConverter;
 import com.pet.entity.Pet;
+import com.pet.entity.PetImage;
 import com.pet.enums.PetStatus;
 import com.pet.exception.ResourceNotFoundException;
+import com.pet.modal.request.PetImageDTO;
 import com.pet.modal.request.PetRequestDTO;
-import com.pet.modal.request.PetSearchRequestDTO;
 import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PetForListResponseDTO;
 import com.pet.modal.response.PetResponseDTO;
+import com.pet.modal.search.PetSearchRequestDTO;
+import com.pet.repository.PetImageRepository;
 import com.pet.repository.PetRepository;
 import com.pet.repository.spec.PetSpecification;
 import com.pet.service.PetService;
-import com.pet.converter.PetConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,15 +40,14 @@ public class PetServiceImpl implements PetService {
     @Autowired
     private PetRepository petRepository;
     @Autowired
+    private PetImageRepository petImageRepository;
+    @Autowired
     private PetConverter petConverter;
 
     @Override
     public List<Pet> getPets() {
-        List<Pet> pets = petRepository.findAll();
-        return pets;
+        return petRepository.findAll();
     }
-
-
 
     @Override
     public PetResponseDTO getPetById(String petId) {
@@ -75,10 +80,15 @@ public class PetServiceImpl implements PetService {
     @Override
     public PageResponse<PetForListResponseDTO> advanceSearch(PetSearchRequestDTO request) {
         Specification<Pet> spec = new PetSpecification(request);
-        String sortField = getSortField(request.getSortBy());
-        Sort sort = Sort.by(request.getSortDirection().equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
-        Pageable pageable = PageRequest.of(request.getPage(), request.getPageSize(), sort);
 
+        Sort sort;
+        if ("asc".equalsIgnoreCase(request.getSortDirection())) {
+            sort = Sort.by(Sort.Direction.ASC, getSortField(request.getSortBy()));
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, getSortField(request.getSortBy()));
+        }
+
+        Pageable pageable = PageRequest.of(request.getPage(), request.getPageSize(), sort);
         Page<Pet> petPage = petRepository.findAll(spec, pageable);
         return petConverter.toPageResponse(petPage);
     }
@@ -87,9 +97,11 @@ public class PetServiceImpl implements PetService {
     @Transactional
     public PetResponseDTO addOrUpdatePet(PetRequestDTO requestDTO) {
         Pet pet;
-        if (requestDTO.getPetId() != null) {
+        boolean isUpdate = requestDTO.getPetId() != null;
+
+        if (isUpdate) {
             pet = petRepository.findById(requestDTO.getPetId())
-                    .orElseThrow(() -> new RuntimeException("Pet not found with id: " + requestDTO.getPetId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
             pet.setUpdatedAt(LocalDateTime.now());
         } else {
             pet = new Pet();
@@ -97,10 +109,32 @@ public class PetServiceImpl implements PetService {
         }
         pet = petConverter.mapToEntity(requestDTO, pet);
         Pet savedPet = petRepository.save(pet);
+        if (requestDTO.getImages() != null && !requestDTO.getImages().isEmpty()) {
+            handlePetImages(savedPet, requestDTO.getImages());
+        }
+
         return petConverter.mapToDTO(savedPet);
     }
 
-    // Phương thức xóa mềm (soft delete) bằng cách đặt trạng thái pet thành DRAFT
+    private void handlePetImages(Pet pet, List<PetImageDTO> imageDTOs) {
+        Set<PetImage> newImages = new HashSet<>();
+        for (PetImageDTO imgDto : imageDTOs) {
+            PetImage image = new PetImage();
+            if(imgDto.getId() != null){
+                image = petImageRepository.findById(imgDto.getId()).orElse(new PetImage());
+            } else {
+                image.setImageId(UUID.randomUUID().toString().substring(0, 10));
+                image.setCreatedAt(LocalDateTime.now());
+            }
+            image.setPet(pet);
+            image.setImageUrl(imgDto.getImageUrl());
+            image.setIsThumbnail(imgDto.getIsThumbnail());
+            petImageRepository.save(image);
+            newImages.add(image);
+        }
+        pet.setImages(newImages);
+    }
+
     @Override
     @Transactional
     public PetResponseDTO inactivePet(String petId) {
@@ -110,6 +144,15 @@ public class PetServiceImpl implements PetService {
         pet.setUpdatedAt(LocalDateTime.now());
         Pet savedPet = petRepository.save(pet);
         return petConverter.mapToDTO(savedPet);
+    }
+
+    @Override
+    @Transactional
+    public void deletePetPermanent(String petId) {
+        if(!petRepository.existsById(petId)){
+            throw new ResourceNotFoundException("Pet not found");
+        }
+        petRepository.deleteById(petId);
     }
 
     @Override
@@ -125,6 +168,7 @@ public class PetServiceImpl implements PetService {
     }
 
     private String getSortField(String sortBy) {
+        if (sortBy == null) return "createdAt";
         return switch (sortBy) {
             case "name" -> "name";
             case "price" -> "price";

@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface PetRepository extends JpaRepository<Pet, String>, JpaSpecificationExecutor<Pet> {
     Page<Pet> findByCategory_CategoryId(String categoryId, Pageable pageable);
     Page<Pet> findAllByStatus(PetStatus status, Pageable pageable);
+    long count();
 }

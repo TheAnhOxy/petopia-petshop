@@ -1,4 +1,4 @@
-package com.pet.controller;
+package com.pet.controller.admin;
 
 import com.pet.modal.request.PromotionRequestDTO;
 import com.pet.modal.response.PageResponse;
@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/promotions")

@@ -11,6 +11,7 @@ import com.pet.exception.ResourceNotFoundException;
 import com.pet.modal.request.PetRequestDTO;
 import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PetForListResponseDTO;
+import com.pet.modal.response.PetImageResponseDTO;
 import com.pet.modal.response.PetResponseDTO;
 import com.pet.repository.CategoryRepository;
 import com.pet.repository.OrderItemRepository;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class PetConverter {
@@ -95,19 +97,34 @@ public class PetConverter {
     private <T> T mapPet(Pet pet, Class<T> dtoClass) {
         T dto = modelMapper.getModelMapper().map(pet, dtoClass);
 
-        Optional<PetImage> mainImageOpt = petImageRepository.findByIsThumbnailTrueAndPet_PetId(pet.getPetId());
-        String mainImageUrl = mainImageOpt.map(PetImage::getImageUrl).orElse(null);
+        // Lấy ảnh thumbnail
+        Optional<PetImage> mainImageOpt = pet.getImages().stream()
+                .filter(img -> Boolean.TRUE.equals(img.getIsThumbnail()))
+                .findFirst();
+        String mainImageUrl = mainImageOpt.map(PetImage::getImageUrl)
+                .orElse(pet.getImages().isEmpty() ? null : pet.getImages().iterator().next().getImageUrl());
 
         if (dto instanceof PetForListResponseDTO) {
-            PetForListResponseDTO petForListDTO = (PetForListResponseDTO) dto;
-            petForListDTO.setMainImageUrl(mainImageUrl);
-            petForListDTO.setRating(calculateAverageRating(pet));
-            petForListDTO.setReviewCount(pet.getReviews() != null && !pet.getReviews().isEmpty() ? pet.getReviews().size() : 0);
+            PetForListResponseDTO petListDTO = (PetForListResponseDTO) dto;
+            petListDTO.setMainImageUrl(mainImageUrl);
+            if(pet.getCategory() != null) petListDTO.setCategoryName(pet.getCategory().getName());
+            petListDTO.setRating(calculateAverageRating(pet));
+            petListDTO.setReviewCount(pet.getReviews() != null ? pet.getReviews().size() : 0);
+
         } else if (dto instanceof PetResponseDTO) {
             PetResponseDTO petDTO = (PetResponseDTO) dto;
             petDTO.setMainImageUrl(mainImageUrl);
+            if(pet.getCategory() != null) {
+                petDTO.setCategoryName(pet.getCategory().getName());
+                petDTO.setCategoryId(pet.getCategory().getCategoryId());
+            }
+            List<PetImageResponseDTO> imgDtos = pet.getImages().stream()
+                    .map(img -> modelMapper.getModelMapper().map(img, PetImageResponseDTO.class))
+                    .collect(Collectors.toList());
+            petDTO.setImages(imgDtos);
+
             petDTO.setRating(calculateAverageRating(pet));
-            petDTO.setReviewCount(pet.getReviews() != null && !pet.getReviews().isEmpty() ? pet.getReviews().size() : 0);
+            petDTO.setReviewCount(pet.getReviews() != null ? pet.getReviews().size() : 0);
         }
         return dto;
     }
