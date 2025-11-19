@@ -68,7 +68,9 @@ public class ReviewServiceImpl implements ReviewService {
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new ResourceNotFoundException("Pet not found"));
 
-        User user = userRepository.findById(request.getUserId());
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
 
         Review review = new Review();
         review.setReviewId(generateReviewId());

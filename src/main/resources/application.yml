@@ -43,7 +43,7 @@ logging:
     org.springframework.data.repository: DEBUG
 
 jwt:
-  secretKey: YXNkZmFzZGZhc2RmYXNkZmFzZGZhc2Rm
+  secretKey: "UGV0b3BpYS1Qcm9qZWN0LVNlY3JldC1LZXktRm9yLUpXVC1HZW5lcmF0aW9uLVZlcnktU2VjdXJlLUFuZC1Mb25n"
   expiration: 86400
 
 dev:

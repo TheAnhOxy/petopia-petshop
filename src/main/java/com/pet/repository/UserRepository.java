@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<String, User> {
+public interface UserRepository extends JpaRepository<User, String> {
 
-    User findById(String id);
+    Optional<User> findById(String id);
 
     @Query("SELECT u FROM User u WHERE u.username = :identifier OR u.phoneNumber = :identifier")
     Optional<User> findByUsernameOrPhoneNumber(String identifier);
