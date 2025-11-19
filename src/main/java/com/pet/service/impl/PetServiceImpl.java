@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,30 +114,55 @@ public class PetServiceImpl implements PetService {
     }
 
     private void handlePetImages(Pet pet, List<PetImageDTO> imageDTOs) {
-        pet.getImages().clear();
+        Map<String, PetImageDTO> dtoMap = imageDTOs.stream()
+                .filter(dto -> dto.getId() != null)
+                .collect(Collectors.toMap(PetImageDTO::getId, dto -> dto));
+        Iterator<PetImage> iterator = pet.getImages().iterator();
+        while (iterator.hasNext()) {
+            PetImage oldImg = iterator.next();
 
-        for (PetImageDTO imgDto : imageDTOs) {
-            PetImage image = new PetImage();
-            image.setImageId("IMG" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase());
-            image.setPet(pet);
-            image.setImageUrl(imgDto.getImageUrl());
-            image.setIsThumbnail(Boolean.TRUE.equals(imgDto.getIsThumbnail()));
-            image.setCreatedAt(LocalDateTime.now());
+            if (!dtoMap.containsKey(oldImg.getImageId())) {
+                iterator.remove();
+            }
+        }
+        for (PetImage img : pet.getImages()) {
+            PetImageDTO dto = dtoMap.get(img.getImageId());
+            if (dto != null) {
+                img.setImageUrl(dto.getImageUrl());
+                img.setIsThumbnail(Boolean.TRUE.equals(dto.getIsThumbnail()));
+            }
+        }
+        for (PetImageDTO dto : imageDTOs) {
+            if (dto.getId() == null) {
+                PetImage newImg = new PetImage();
+                newImg.setImageId(generateNextPetImageId());
+                newImg.setPet(pet);
+                newImg.setCreatedAt(LocalDateTime.now());
+                newImg.setImageUrl(dto.getImageUrl());
+                newImg.setIsThumbnail(Boolean.TRUE.equals(dto.getIsThumbnail()));
 
-            pet.getImages().add(image);
+                pet.getImages().add(newImg);
+            }
         }
     }
+
+
 
 
 
     private String generateNextPetImageId() {
         String maxId = petImageRepository.findMaxImageId();
         int next = 1;
+
         if (maxId != null && maxId.startsWith("PI")) {
-            next = Integer.parseInt(maxId.substring(2)) + 1;
+            try {
+                next = Integer.parseInt(maxId.substring(2)) + 1;
+            } catch (NumberFormatException ignored) {}
         }
+
         return String.format("PI%03d", next);
     }
+
 
 
     @Override
