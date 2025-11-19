@@ -1,16 +1,16 @@
-CREATE DATABASE IF NOT EXISTS petshop;
+CREATE DATABASE IF NOT EXISTS petshop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE petshop;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- 1. Bảng users: Lưu thông tin user, admin, customer
+-- 1. users
 CREATE TABLE users (
-    user_id VARCHAR(10) PRIMARY KEY,  
+    user_id VARCHAR(10) PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
-    avatar VARCHAR(255), -- ảnh đại diện người dùng
+    avatar VARCHAR(255),
     phone_number VARCHAR(255),
     role ENUM('CUSTOMER', 'ADMIN') DEFAULT 'CUSTOMER',
     is_active TINYINT(1) DEFAULT 1,
@@ -19,9 +19,9 @@ CREATE TABLE users (
     INDEX idx_email (email)
 );
 
--- 2. Bảng addresses: Lưu địa chỉ user
+-- 2. addresses
 CREATE TABLE addresses (
-    address_id VARCHAR(10) PRIMARY KEY,  
+    address_id VARCHAR(10) PRIMARY KEY,
     user_id VARCHAR(10),
     street VARCHAR(255) NOT NULL,
     ward VARCHAR(255),
@@ -34,9 +34,9 @@ CREATE TABLE addresses (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 3. Bảng categories: Lưu trữ loại và giống thú cưng
+-- 3. categories
 CREATE TABLE categories (
-    category_id VARCHAR(10) PRIMARY KEY, 
+    category_id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     parent_id VARCHAR(10),
@@ -46,14 +46,14 @@ CREATE TABLE categories (
     INDEX idx_name (name)
 );
 
--- 4. Bảng pets: Lưu thông tin thú cưng (thêm cột discountPrice)
+-- 4. pets
 CREATE TABLE pets (
-    pet_id VARCHAR(10) PRIMARY KEY, 
+    pet_id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     category_id VARCHAR(10),
     age INT,
-    gender ENUM('MALE', 'FEMALE') DEFAULT 'MALE', 
+    gender ENUM('MALE', 'FEMALE') DEFAULT 'MALE',
     price DOUBLE NOT NULL,
     discount_price DOUBLE DEFAULT NULL,
     health_status VARCHAR(255),
@@ -70,9 +70,9 @@ CREATE TABLE pets (
     FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL
 );
 
--- 5. Bảng pet_images: Lưu trữ hình ảnh của thú cưng
+-- 5. pet_images
 CREATE TABLE pet_images (
-    image_id VARCHAR(10) PRIMARY KEY,  
+    image_id VARCHAR(10) PRIMARY KEY,
     pet_id VARCHAR(10),
     image_url VARCHAR(255) NOT NULL,
     is_thumbnail TINYINT(1) DEFAULT 0,
@@ -80,9 +80,9 @@ CREATE TABLE pet_images (
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON DELETE CASCADE
 );
 
--- 6. Bảng services: Lưu trữ các dịch vụ chăm sóc
+-- 6. services
 CREATE TABLE services (
-    service_id VARCHAR(10) PRIMARY KEY,  
+    service_id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     price DOUBLE NOT NULL,
@@ -91,9 +91,9 @@ CREATE TABLE services (
     updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)
 );
 
--- 7. Bảng wishlists: Danh sách yêu thích của người dùng
+-- 7. wishlists
 CREATE TABLE wishlists (
-    wishlist_id VARCHAR(10) PRIMARY KEY,  
+    wishlist_id VARCHAR(10) PRIMARY KEY,
     user_id VARCHAR(10),
     pet_id VARCHAR(10),
     added_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
@@ -101,12 +101,12 @@ CREATE TABLE wishlists (
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON DELETE CASCADE
 );
 
--- 8. Bảng orders: Đơn hàng
+-- 8. orders
 CREATE TABLE orders (
-    order_id VARCHAR(10) PRIMARY KEY, 
+    order_id VARCHAR(10) PRIMARY KEY,
     user_id VARCHAR(10),
     address_id VARCHAR(10),
-    total_amount DOUBLE NOT NULL, 
+    total_amount DOUBLE NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED') DEFAULT 'PENDING',
     payment_status ENUM('UNPAID', 'PAID', 'FAILED', 'REFUNDED') DEFAULT 'UNPAID',
     desired_delivery_date DATE,
@@ -121,9 +121,9 @@ CREATE TABLE orders (
     INDEX idx_status (status)
 );
 
--- 9. Bảng order_items: Các mục trong đơn hàng (thú cưng)
+-- 9. order_items
 CREATE TABLE order_items (
-    order_item_id VARCHAR(10) PRIMARY KEY,  
+    order_item_id VARCHAR(10) PRIMARY KEY,
     order_id VARCHAR(10),
     pet_id VARCHAR(10),
     quantity INT NOT NULL DEFAULT 1,
@@ -133,12 +133,12 @@ CREATE TABLE order_items (
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON DELETE CASCADE
 );
 
--- 10. Bảng booking_services: Dịch vụ kèm theo trong đơn hàng
+-- 10. booking_services
 CREATE TABLE booking_services (
-    booking_service_id VARCHAR(10) PRIMARY KEY, 
+    booking_service_id VARCHAR(10) PRIMARY KEY,
     user_id VARCHAR(10),
     service_id VARCHAR(10),
-    appointment_date DATETIME(6) NULL,  -- lịch hẹn (NULL nếu chưa hẹn)
+    appointment_date DATETIME(6) NULL,
     note TEXT,
     quantity INT NOT NULL DEFAULT 1,
     price_at_purchase DOUBLE NOT NULL,
@@ -148,9 +148,9 @@ CREATE TABLE booking_services (
     FOREIGN KEY (service_id) REFERENCES services(service_id) ON DELETE CASCADE
 );
 
--- 11. Bảng pre_bookings: Đặt trước thú cưng
+-- 11. pre_bookings
 CREATE TABLE pre_bookings (
-    booking_id VARCHAR(10) PRIMARY KEY,  
+    booking_id VARCHAR(10) PRIMARY KEY,
     user_id VARCHAR(10),
     pet_id VARCHAR(10),
     deposit_amount DOUBLE NOT NULL,
@@ -162,9 +162,9 @@ CREATE TABLE pre_bookings (
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON DELETE CASCADE
 );
 
--- 12. Bảng payments: Thanh toán
+-- 12. payments
 CREATE TABLE payments (
-    payment_id VARCHAR(10) PRIMARY KEY, 
+    payment_id VARCHAR(10) PRIMARY KEY,
     order_id VARCHAR(10),
     amount DOUBLE NOT NULL,
     payment_method ENUM('COD', 'BANK_TRANSFER') NOT NULL,
@@ -179,9 +179,9 @@ CREATE TABLE payments (
     INDEX idx_transaction_id (transaction_id)
 );
 
--- 13. Bảng delivery_providers: Nhà cung cấp vận chuyển
+-- 13. delivery_providers
 CREATE TABLE delivery_providers (
-    provider_id VARCHAR(10) PRIMARY KEY,  
+    provider_id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     contact_phone VARCHAR(20),
@@ -191,9 +191,9 @@ CREATE TABLE delivery_providers (
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)
 );
 
--- 14. Bảng deliveries: Thông tin vận chuyển
+-- 14. deliveries
 CREATE TABLE deliveries (
-    delivery_id VARCHAR(10) PRIMARY KEY,  
+    delivery_id VARCHAR(10) PRIMARY KEY,
     order_id VARCHAR(10) UNIQUE,
     provider_id VARCHAR(10),
     tracking_number VARCHAR(50) UNIQUE,
@@ -209,7 +209,7 @@ CREATE TABLE deliveries (
     INDEX idx_tracking_number (tracking_number)
 );
 
--- 15. Bảng delivery_history: Lịch sử trạng thái vận chuyển
+-- 15. delivery_history
 CREATE TABLE delivery_history (
     history_id VARCHAR(10) PRIMARY KEY,
     delivery_id VARCHAR(10),
@@ -220,9 +220,9 @@ CREATE TABLE delivery_history (
     FOREIGN KEY (delivery_id) REFERENCES deliveries(delivery_id) ON DELETE CASCADE
 );
 
--- 16. Bảng vouchers: Voucher (mã giảm giá nhập thủ công)
+-- 16. vouchers
 CREATE TABLE vouchers (
-    voucher_id VARCHAR(10) PRIMARY KEY, 
+    voucher_id VARCHAR(10) PRIMARY KEY,
     code VARCHAR(255) UNIQUE NOT NULL,
     description VARCHAR(255),
     discount_type ENUM('PERCENTAGE', 'FIXED_AMOUNT') NOT NULL,
@@ -233,13 +233,12 @@ CREATE TABLE vouchers (
     max_usage INT,
     used_count INT DEFAULT 0,
     status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
-    image_url VARCHAR(255), -- ảnh đại diện cho voucher
+    image_url VARCHAR(255),
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     INDEX idx_code (code)
 );
 
-
--- 17. Bảng promotions: Khuyến mãi
+-- 17. promotions
 CREATE TABLE promotions (
     promotion_id VARCHAR(10) PRIMARY KEY,
     code VARCHAR(255) UNIQUE NOT NULL,
@@ -259,9 +258,9 @@ CREATE TABLE promotions (
     INDEX idx_code (code)
 );
 
--- 18. Bảng order_vouchers: Voucher áp dụng cho đơn hàng
+-- 18. order_vouchers
 CREATE TABLE order_vouchers (
-    order_voucher_id VARCHAR(10) PRIMARY KEY, 
+    order_voucher_id VARCHAR(10) PRIMARY KEY,
     order_id VARCHAR(10),
     voucher_id VARCHAR(10),
     discount_applied DOUBLE NOT NULL,
@@ -269,9 +268,9 @@ CREATE TABLE order_vouchers (
     FOREIGN KEY (voucher_id) REFERENCES vouchers(voucher_id) ON DELETE CASCADE
 );
 
--- 19. Bảng order_promotions: Khuyến mãi áp dụng cho đơn hàng
+-- 19. order_promotions
 CREATE TABLE order_promotions (
-    order_promotion_id VARCHAR(10) PRIMARY KEY,  
+    order_promotion_id VARCHAR(10) PRIMARY KEY,
     order_id VARCHAR(10),
     promotion_id VARCHAR(10),
     discount_applied DOUBLE NOT NULL,
@@ -279,13 +278,15 @@ CREATE TABLE order_promotions (
     FOREIGN KEY (promotion_id) REFERENCES promotions(promotion_id) ON DELETE CASCADE
 );
 
--- 20. Bảng reviews: Đánh giá và bình luận về thú cưng
+-- 20. reviews (đã thêm comment, reply, reply_date)
 CREATE TABLE reviews (
-    review_id VARCHAR(10) PRIMARY KEY,  
+    review_id VARCHAR(10) PRIMARY KEY,
     pet_id VARCHAR(10),
     user_id VARCHAR(10),
     rating INT CHECK (rating >= 1 AND rating <= 5),
     comment TEXT,
+    reply TEXT,                    -- Trả lời từ admin/shop
+    reply_date DATETIME(6) NULL,   -- Thời gian trả lời
     image_url VARCHAR(255),
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
@@ -293,9 +294,9 @@ CREATE TABLE reviews (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
--- 21. Bảng articles: Tin tức và bài viết
+-- 21. articles
 CREATE TABLE articles (
-    article_id VARCHAR(10) PRIMARY KEY,  
+    article_id VARCHAR(10) PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     author_id VARCHAR(10),
@@ -305,9 +306,9 @@ CREATE TABLE articles (
     FOREIGN KEY (author_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
--- 22. Bảng article_comments: Bình luận cho bài viết
+-- 22. article_comments
 CREATE TABLE article_comments (
-    comment_id VARCHAR(10) PRIMARY KEY,  
+    comment_id VARCHAR(10) PRIMARY KEY,
     article_id VARCHAR(10),
     user_id VARCHAR(10),
     content TEXT NOT NULL,
@@ -317,9 +318,9 @@ CREATE TABLE article_comments (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
--- 23. Bảng notifications: Thông báo
+-- 23. notifications
 CREATE TABLE notifications (
-    notification_id VARCHAR(10) PRIMARY KEY,  
+    notification_id VARCHAR(10) PRIMARY KEY,
     user_id VARCHAR(10),
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
@@ -329,28 +330,28 @@ CREATE TABLE notifications (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 24. Bảng search_history: Lưu trữ lịch sử tìm kiếm
+-- 24. search_history
 CREATE TABLE search_history (
-    history_id VARCHAR(10) PRIMARY KEY,  
+    history_id VARCHAR(10) PRIMARY KEY,
     user_id VARCHAR(10),
     querySearch VARCHAR(255) NOT NULL,
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 25. Bảng vaccines: Lưu trữ thông tin vác xin tiêm chủng cho thú cưng
+-- 25. vaccines
 CREATE TABLE vaccines (
     vaccine_id VARCHAR(10) PRIMARY KEY,
-    user_id VARCHAR(10),                -- Liên kết đến bảng users (role = CUSTOMER)
-    pet_id VARCHAR(10),                 -- Liên kết đến bảng pets
-    vaccine_name VARCHAR(255) NOT NULL, -- Tên vaccine
-    vaccine_type VARCHAR(100),          -- Loại vaccine (virus, dại, 7 bệnh,...)
-    description TEXT,                   -- Mô tả chi tiết
-    file VARCHAR(255),                  -- File chứng nhận / hồ sơ tiêm
+    user_id VARCHAR(10),
+    pet_id VARCHAR(10),
+    vaccine_name VARCHAR(255) NOT NULL,
+    vaccine_type VARCHAR(100),
+    description TEXT,
+    file VARCHAR(255),
     status ENUM('Đã tiêm', 'Chưa tiêm', 'Đang chờ') DEFAULT 'Chưa tiêm',
-    note TEXT,                          -- Ghi chú thêm
-    start_date DATETIME(6),             -- Thời gian bắt đầu (đăng ký hoặc tiêm)
-    end_date DATETIME(6),               -- Thời gian kết thúc / hạn tiếp theo
+    note TEXT,
+    start_date DATETIME(6),
+    end_date DATETIME(6),
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -358,10 +359,10 @@ CREATE TABLE vaccines (
 );
 
 
-
 SET FOREIGN_KEY_CHECKS = 1;
 
 USE petshop;
+
 
 -- Dữ liệu mẫu cho bảng users
 INSERT INTO users (user_id, username, email, password_hash, full_name, avatar, phone_number, role, is_active, created_at, updated_at) VALUES
@@ -563,8 +564,8 @@ INSERT INTO delivery_history (history_id, delivery_id, status, description, loca
 
 -- Dữ liệu mẫu cho bảng vouchers
 INSERT INTO vouchers (
-    voucher_id, code, description, discount_type, discount_value, 
-    min_order_amount, start_date, end_date, max_usage, used_count, 
+    voucher_id, code, description, discount_type, discount_value,
+    min_order_amount, start_date, end_date, max_usage, used_count,
     status, image_url, created_at
 ) VALUES
 ('V001', 'PET10', 'Giảm 10% cho đơn hàng', 'PERCENTAGE', 10, 10000000, '2025-08-01', '2025-08-31', 100, 0, 'ACTIVE', 'https://i.imgur.com/1vOuWJg.jpg', '2025-08-11 14:26:00'),
@@ -617,18 +618,20 @@ INSERT INTO order_promotions (order_promotion_id, order_id, promotion_id, discou
 ('OP009', 'O001', 'PR002', 1000000),
 ('OP010', 'O002', 'PR005', 2700000);
 
--- Dữ liệu mẫu cho bảng reviews
-INSERT INTO reviews (review_id, pet_id, user_id, rating, comment, image_url, created_at, updated_at) VALUES
-('R001', 'P001', 'U001', 5, 'Poodle rất đáng yêu, lông mềm mại!', 'review_poodle.jpg', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R002', 'P002', 'U002', 4, 'Golden rất thông minh, nhưng cần huấn luyện thêm.', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R003', 'P003', 'U004', 5, 'Husky năng động, đúng như kỳ vọng!', 'review_husky.jpg', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R004', 'P004', 'U005', 4, 'Mèo Ba Tư dịu dàng, nhưng hơi kén ăn.', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R005', 'P005', 'U006', 5, 'Mèo Anh Lông Ngắn siêu đáng yêu!', 'review_british.jpg', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R006', 'P006', 'U007', 4, 'Mèo Xiêm thanh lịch, thích hợp với nhà nhỏ.', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R007', 'P007', 'U008', 5, 'Chihuahua nhỏ mà có võ, rất lanh lợi!', 'review_chihuahua.jpg', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R008', 'P008', 'U009', 5, 'Ragdoll hiền lành, thích nằm dài cả ngày.', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R009', 'P009', 'U010', 4, 'Poodle nhí đáng yêu, lông xoăn đẹp.', 'review_poodle2.jpg', '2025-08-11 14:26:00', '2025-08-11 14:26:00'),
-('R010', 'P010', 'U001', 5, 'Golden bé rất khỏe, thích hợp nuôi gia đình.', NULL, '2025-08-11 14:26:00', '2025-08-11 14:26:00');
+
+-- reviews (có thêm reply + reply_date)
+INSERT INTO reviews (review_id, pet_id, user_id, rating, comment, reply, reply_date, image_url, created_at) VALUES
+('R001', 'P001', 'U001', 5, 'Poodle rất đáng yêu, lông mềm mại!', 'Cảm ơn bạn đã tin tưởng shop! Bé sẽ luôn khỏe mạnh bên bạn nhé.', '2025-08-12 10:30:00', 'review_poodle.jpg', '2025-08-11 14:26:00'),
+('R002', 'P002', 'U002', 4, 'Golden rất thông minh, nhưng cần huấn luyện thêm.', 'Shop có dịch vụ huấn luyện cơ bản, bạn có thể đặt lịch nhé!', '2025-08-13 09:15:00', NULL, '2025-08-11 14:26:00'),
+('R003', 'P003', 'U004', 5, 'Husky năng động, đúng như kỳ vọng!', 'Husky nhà mình cũng nghịch lắm, cảm ơn bạn đã chia sẻ!', '2025-08-12 15:20:00', 'review_husky.jpg', '2025-08-11 14:26:00'),
+('R004', 'P004', 'U005', 4, 'Mèo Ba Tư dịu dàng, nhưng hơi kén ăn.', 'Bạn thử thức ăn Royal Canin Persian xem, rất hợp với bé!', '2025-08-14 11:00:00', NULL, '2025-08-11 14:26:00'),
+('R005', 'P005', 'U006', 5, 'Mèo Anh Lông Ngắn siêu đáng yêu!', 'Cảm ơn bạn! Bé nhà mình cũng là British đây ', '2025-08-12 16:45:00', 'review_british.jpg', '2025-08-11 14:26:00'),
+('R006', 'P006', 'U007', 4, 'Mèo Xiêm thanh lịch, thích hợp với nhà nhỏ.', NULL, NULL, NULL, '2025-08-11 14:26:00'),
+('R007', 'P007', 'U008', 5, 'Chihuahua nhỏ mà có võ, rất lanh lợi!', 'Bé nhà bạn đúng chuẩn “nhỏ mà có võ” luôn!', '2025-08-13 14:10:00', 'review_chihuahua.jpg', '2025-08-11 14:26:00'),
+('R008', 'P008', 'U009', 5, 'Ragdoll hiền lành, thích nằm dài cả ngày.', 'Đúng tính cách Ragdoll luôn, cảm ơn bạn!', '2025-08-12 17:30:00', NULL, '2025-08-11 14:26:00'),
+('R009', 'P009', 'U010', 4, 'Poodle nhí đáng yêu, lông xoăn đẹp.', NULL, NULL, 'review_poodle2.jpg', '2025-08-11 14:26:00'),
+('R010', 'P010', 'U001', 5, 'Golden bé rất khỏe, thích hợp nuôi gia đình.', 'Cảm ơn bạn đã chọn shop! Chúc gia đình luôn vui vẻ bên bé nhé ', '2025-08-14 10:00:00', NULL, '2025-08-11 14:26:00');
+
 
 -- Dữ liệu mẫu cho bảng articles
 INSERT INTO articles (article_id, title, content, author_id, image_url, created_at, updated_at) VALUES
@@ -670,7 +673,7 @@ INSERT INTO notifications (notification_id, user_id, title, content, typeNote, i
 ('N010', 'U001', 'Bài viết mới', 'Xem bài viết mới về chăm sóc Poodle tại mục tin tức!', 'ORDER_UPDATE', 0, '2025-08-11 14:26:00');
 
 -- Dữ liệu mẫu cho bảng vaccines
-INSERT INTO vaccines 
+INSERT INTO vaccines
 (vaccine_id, user_id, pet_id, vaccine_name, vaccine_type, description, file, status, note, start_date, end_date)
 VALUES
 ('V001', 'U001', 'P001', 'Vaccine Dại', 'Virus', 'Phòng bệnh dại cho chó', 'files/vaccine_rabies_P001.pdf', 'Đã tiêm', 'Tiêm mũi nhắc sau 1 năm', '2025-08-01 09:30:00', '2026-08-01 09:30:00'),
@@ -683,3 +686,5 @@ VALUES
 ('V008', 'U008', 'P008', 'Vaccine Bordetella', 'Vi khuẩn', 'Phòng ho cũi ở chó', 'files/vaccine_bordetella_P008.pdf', 'Chưa tiêm', 'Chờ bác sĩ xác nhận', NULL, NULL),
 ('V009', 'U009', 'P009', 'Vaccine Coronavirus', 'Virus', 'Phòng bệnh viêm ruột do Coronavirus', 'files/vaccine_corona_P009.pdf', 'Đã tiêm', 'Không có phản ứng phụ', '2025-04-02 13:20:00', '2026-04-02 13:20:00'),
 ('V010', 'U010', 'P010', 'Vaccine Lyme', 'Vi khuẩn', 'Phòng bệnh Lyme do ve truyền', 'files/vaccine_lyme_P010.pdf', 'Chưa tiêm', 'Đang chờ lịch khám tổng quát', NULL, NULL);
+
+
