@@ -3,6 +3,7 @@ package com.pet.controller.web;
 import com.pet.entity.Pet;
 import com.pet.modal.request.PetRequestDTO;
 
+import com.pet.modal.response.ApiResponse;
 import com.pet.modal.response.PageResponse;
 import com.pet.modal.response.PetForListResponseDTO;
 import com.pet.modal.response.PetResponseDTO;
@@ -45,6 +46,27 @@ public class PetWebController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getPetById(@PathVariable String id) {
+        PetResponseDTO pet = petService.getPetById(id);
+
+        if (pet == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.builder()
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .message("Không tìm thấy thú cưng")
+                            .build());
+        }
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Lấy chi tiết thú cưng thành công")
+                        .data(pet)
+                        .build()
+        );
     }
 
 }
