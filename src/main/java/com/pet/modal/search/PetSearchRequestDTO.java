@@ -24,7 +24,8 @@ public class PetSearchRequestDTO {
     private Integer pageSize = 10;
     private String sortBy = "created_at";;
     private String sortDirection = "desc";
-
+    private Double minFinalPrice;
+    private Double maxFinalPrice;
     public void validate() {
         if(minPrice != null && maxPrice != null && minPrice > maxPrice) {
             throw new IllegalArgumentException("minPrice cannot be greater than maxPrice");
