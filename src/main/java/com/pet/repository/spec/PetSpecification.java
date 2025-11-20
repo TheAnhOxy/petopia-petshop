@@ -69,6 +69,7 @@ public class PetSpecification implements Specification<Pet> {
         predicate = buildBasicPredicates(predicate, root, cb);
         predicate = buildRatingPredicate(predicate, root, query, cb);
         predicate = buildOnSalePredicate(predicate, root, cb);
+        predicate = buildFinalPricePredicate(predicate, root, cb);
         return predicate;
     }
 
@@ -122,6 +123,25 @@ public class PetSpecification implements Specification<Pet> {
         return predicate;
     }
 
+    private Predicate buildFinalPricePredicate(Predicate predicate, Root<Pet> root, CriteriaBuilder cb) {
+        Double minFinalPrice = (Double) getFieldValue("minFinalPrice");
+        Double maxFinalPrice = (Double) getFieldValue("maxFinalPrice");
+
+        if (minFinalPrice != null || maxFinalPrice != null) {
+            Expression<Double> finalPrice = cb.<Double>selectCase()
+                    .when(cb.isNotNull(root.get("discountPrice")), root.get("discountPrice"))
+                    .otherwise(root.get("price"));
+
+            if (minFinalPrice != null) {
+                predicate = cb.and(predicate, cb.greaterThanOrEqualTo(finalPrice, minFinalPrice));
+            }
+            if (maxFinalPrice != null) {
+                predicate = cb.and(predicate, cb.lessThanOrEqualTo(finalPrice, maxFinalPrice));
+            }
+        }
+        return predicate;
+    }
+
     private Predicate buildOnSalePredicate(Predicate predicate, Root<Pet> root, CriteriaBuilder cb) {
         Boolean onSale = (Boolean) getFieldValue("onSale");
         if(onSale != null && onSale) {
@@ -147,6 +167,8 @@ public class PetSpecification implements Specification<Pet> {
             case "onSale" -> requestDTO.getOnSale();
             case "color" -> requestDTO.getColor();
             case "furType" -> requestDTO.getFurType();
+            case "minFinalPrice" -> requestDTO.getMinFinalPrice();
+            case "maxFinalPrice" -> requestDTO.getMaxFinalPrice();
             default -> null;
         };
     }
