@@ -19,7 +19,7 @@ public class UserController {
     private IUserService userService;
 
 
-    
+
 
     @GetMapping("/addresses")
     public ResponseEntity<ApiResponse> getMyAddresses(@AuthenticationPrincipal User currentUser) {
