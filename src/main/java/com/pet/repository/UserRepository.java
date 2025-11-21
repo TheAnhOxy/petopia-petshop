@@ -16,5 +16,8 @@ public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 
+    @Query("SELECT u.userId FROM User u ORDER BY u.userId DESC LIMIT 1")
+    Optional<String> findLastUserId();
+
 
 }
